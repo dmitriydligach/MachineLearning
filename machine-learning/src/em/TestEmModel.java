@@ -6,24 +6,22 @@ import java.util.Random;
 
 import data.Dataset;
 import data.I2b2Dataset;
-import data.Instance;
 import data.Split;
 
 public class TestEmModel {
 	
 	public static void main(String[] args) throws IOException {
 
-		final int N = 5; // number of folds
+		final int FOLDS = 5; // number of folds
 		
 		I2b2Dataset dataset = new I2b2Dataset();
 		dataset.loadCSVFile("/home/dima/active/ibd/data/data.txt", "/home/dima/active/ibd/data/labels-cd.txt");
 		dataset.makeAlphabets(); // need label alphabet to init NB classifier
 		
-		Split[] splits = dataset.split(N, new Random(100));
-		System.out.println("done splitting");
+		Split[] splits = dataset.split(FOLDS, new Random(100));
 		
 		double cumulativeAccuracy = 0;
-		for(int fold = 0; fold < N; fold++) {
+		for(int fold = 0; fold < FOLDS; fold++) {
 			Dataset trainSet = splits[fold].getPoolSet();
 			Dataset testSet = splits[fold].getTestSet();
 			
@@ -32,11 +30,8 @@ public class TestEmModel {
 
 			testSet.setAlphabets(trainSet.getLabelAlphabet(), trainSet.getFeatureAlphabet());
 			testSet.makeVectors();
-			
-			for(Instance instance : trainSet.getInstances()) {
-				instance.setClassProbabilities(new HashSet<String>(trainSet.getLabelAlphabet().getStrings()));
-			}
-			
+
+			trainSet.setInstanceProbabilityDistribution(new HashSet<String>(dataset.getLabelAlphabet().getStrings()));
 			EmModel classifier = new EmModel(dataset.getLabelAlphabet());
 			
 			classifier.train(trainSet);
@@ -45,7 +40,7 @@ public class TestEmModel {
 			cumulativeAccuracy = cumulativeAccuracy + accuracy;
 		}
 		
-		double accuracy = cumulativeAccuracy / N;
+		double accuracy = cumulativeAccuracy / FOLDS;
 		System.out.println("average accuracy:\t" + accuracy);
 	}
 }
