@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultiset;
@@ -223,6 +224,21 @@ public class Dataset {
 	 */
 	public void setFeatureAlphabet(Alphabet featureAlphabet) {
 		this.featureAlphabet = featureAlphabet;
+	}
+	
+	/**
+	 * Convert each instance's label into a probability distribution
+	 * over all possible labels. Basically, if the label for this instance
+	 * is "yes", than the probability of "yes" should be 1 and the 
+	 * probability of all other labels should be 0. This is useful when
+	 * a probability distribution over labels is needed rather than
+	 * a single gold labels for each instance (e.g. for EM algorithm).
+	 */
+	public void setInstanceProbabilityDistribution(Set<String> uniqueLabels) {
+	  
+	  for(Instance instance : instances) {
+	    instance.setClassProbabilities(uniqueLabels);
+	  }
 	}
 	
 	/**
