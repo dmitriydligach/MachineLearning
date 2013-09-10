@@ -6,7 +6,6 @@ import java.util.Random;
 
 import data.Dataset;
 import data.I2b2Dataset;
-import data.Instance;
 import data.Split;
 
 public class EmAlgorithm {
@@ -15,7 +14,7 @@ public class EmAlgorithm {
 
     final int FOLDS = 5; // number of folds
     final int ITERATIONS = 0; // number of iterations
-    final int LABELED = 10; // number of labeled examples
+    final int LABELED = 20; // number of labeled examples
     
     I2b2Dataset dataset = new I2b2Dataset();
     dataset.loadCSVFile("/home/dima/active/ibd/data/data.txt", "/home/dima/active/ibd/data/labels-cd.txt");
@@ -61,6 +60,6 @@ public class EmAlgorithm {
     }
     
     double accuracy = cumulativeAccuracy / FOLDS;
-    System.out.println("average accuracy:\t" + accuracy);
+    System.out.println("average accuracy: " + accuracy);
   }
 }

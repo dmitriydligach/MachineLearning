@@ -1,5 +1,6 @@
 package em;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -248,15 +249,22 @@ public class EmModel {
 
     double[] p = new double[2];
     
+    // hack
+    if((logP0 - logP1) > 300) {
+      p[0] = 1;
+      p[1] = 0;
+      return p;
+    }
+    
     // odds0 is p0/p1 or p0 / (1 - p0)
     double odds0 = Math.pow(10, logP0 - logP1);
 
     p[0] = odds0 / (1 + odds0);
     p[1] = 1 / (1 + odds0);
     
+//    System.out.println(logP0 - logP1 + ", " + odds0 + ", " + Arrays.toString(p));
     assert !Double.isNaN(p[0]);
     assert !Double.isInfinite(p[1]);
-
     
     return p;
   }
