@@ -175,6 +175,9 @@ public class EmModel {
 				theta[label][word] = 
 						(1 + getWordCountInClass(dataset, word, label)) / 
 						(numWords + totalClassWords[label]);
+				
+				assert !Double.isNaN(theta[label][word]);
+				assert !Double.isInfinite(theta[label][word]);
 			}
 		}
 	}
@@ -192,6 +195,9 @@ public class EmModel {
 			}
 			
 			priors[classIndex] = (1 + sum) / (numClasses + numInstances);
+			
+			assert !Double.isNaN(priors[classIndex]);
+			assert !Double.isInfinite(priors[classIndex]);
 		}
 	}
 	
