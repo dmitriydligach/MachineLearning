@@ -14,7 +14,7 @@ public class EmAlgorithm {
   public static void main(String[] args) throws IOException {
 
     final int FOLDS = 5; // number of folds
-    final int ITERATIONS = 2; // number of iterations
+    final int ITERATIONS = 0; // number of iterations
     final int LABELED = 10; // number of labeled examples
     
     I2b2Dataset dataset = new I2b2Dataset();
@@ -25,14 +25,13 @@ public class EmAlgorithm {
     double cumulativeAccuracy = 0;
     
     for(int fold = 0; fold < FOLDS; fold++) {
+      
       Dataset labeled = new Dataset();
       Dataset unlabeled = splits[fold].getPoolSet();
       Dataset test = splits[fold].getTestSet();
       
       labeled.add(unlabeled.popRandom(LABELED, new Random(100)));
-      for(Instance instance : labeled.getInstances()) {
-        instance.setClassProbabilities(new HashSet<String>(dataset.getLabelAlphabet().getStrings()));
-      }
+      labeled.setInstanceProbabilityDistribution(new HashSet<String>(dataset.getLabelAlphabet().getStrings()));
       
       labeled.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
       labeled.makeVectors();
