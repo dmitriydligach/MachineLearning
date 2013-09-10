@@ -231,10 +231,10 @@ public class EmModel {
           continue;
         }
         
-        double wordProb = theta[label][word]; // TODO: sometimes theta not a number
-        logSum[label] += wordCount * Math.log10(wordProb);
+        logSum[label] += wordCount * Math.log10(theta[label][word]);
         
-//        System.out.println("prob=" + logSum[label] + ", wordProb=" + wordProb + ", wordCount=" + wordCount);
+        assert !Double.isNaN(logSum[label]);
+        assert !Double.isInfinite(logSum[label]);
       }
     }
     
@@ -253,6 +253,10 @@ public class EmModel {
 
     p[0] = odds0 / (1 + odds0);
     p[1] = 1 / (1 + odds0);
+    
+    assert !Double.isNaN(p[0]);
+    assert !Double.isInfinite(p[1]);
+
     
     return p;
   }
