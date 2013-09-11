@@ -1,4 +1,4 @@
-package em;
+package em.implementation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -241,6 +241,7 @@ public class EmModel {
 	
   /**
    * Convert two unnormalized log probs to probabilities.
+   * TODO: rewrite this method for the multi-class scenario
    */
   public double[] logToProb(double logP0, double logP1) {
 

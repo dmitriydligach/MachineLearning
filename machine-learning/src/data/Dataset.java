@@ -234,7 +234,7 @@ public class Dataset {
 	 * a probability distribution over labels is needed rather than
 	 * a single gold labels for each instance (e.g. for EM algorithm).
 	 */
-	public void setInstanceProbabilityDistribution(Set<String> uniqueLabels) {
+	public void setInstanceClassProbabilityDistribution(Set<String> uniqueLabels) {
 	  
 	  for(Instance instance : instances) {
 	    instance.setClassProbabilities(uniqueLabels);

@@ -1,4 +1,4 @@
-package em;
+package em.implementation;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -31,7 +31,7 @@ public class TestEmModel {
 			testSet.setAlphabets(trainSet.getLabelAlphabet(), trainSet.getFeatureAlphabet());
 			testSet.makeVectors();
 
-			trainSet.setInstanceProbabilityDistribution(new HashSet<String>(dataset.getLabelAlphabet().getStrings()));
+			trainSet.setInstanceClassProbabilityDistribution(new HashSet<String>(dataset.getLabelAlphabet().getStrings()));
 			EmModel classifier = new EmModel(dataset.getLabelAlphabet());
 			
 			classifier.train(trainSet);

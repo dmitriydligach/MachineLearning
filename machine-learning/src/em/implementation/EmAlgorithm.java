@@ -1,4 +1,4 @@
-package em;
+package em.implementation;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -30,7 +30,7 @@ public class EmAlgorithm {
       Dataset test = splits[fold].getTestSet();
       
       labeled.add(unlabeled.popRandom(LABELED, new Random(100)));
-      labeled.setInstanceProbabilityDistribution(new HashSet<String>(dataset.getLabelAlphabet().getStrings()));
+      labeled.setInstanceClassProbabilityDistribution(new HashSet<String>(dataset.getLabelAlphabet().getStrings()));
       
       labeled.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
       labeled.makeVectors();
