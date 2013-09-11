@@ -4,16 +4,47 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Random;
 
+import data.Alphabet;
 import data.Dataset;
 import data.I2b2Dataset;
 import data.Split;
 
-public class EmAlgorithm {
+public class EmApi {
+
+  public static final int ITERATIONS = 10; // number of iterations
+  
+  public static double em(Dataset labeled, Dataset unlabeled, Dataset test, Alphabet labelAlphabet, Alphabet featureAlphabet) {
+    
+    labeled.setAlphabets(labelAlphabet, featureAlphabet);
+    labeled.makeVectors();
+
+    EmModel em = new EmModel(labelAlphabet);
+    em.train(labeled);
+    
+    for(int iteration = 0; iteration < ITERATIONS; iteration++) {
+      
+      // E-step
+      unlabeled.setAlphabets(labelAlphabet, featureAlphabet);
+      unlabeled.makeVectors();
+      em.label(unlabeled);
+
+      // M-step
+      Dataset labeledPlusUnlabeled = new Dataset(labeled.getInstances(), unlabeled.getInstances());
+      labeledPlusUnlabeled.setAlphabets(labelAlphabet, featureAlphabet);
+      labeledPlusUnlabeled.makeVectors();
+      em.train(labeledPlusUnlabeled);
+    }
+    
+    test.setAlphabets(labelAlphabet, featureAlphabet);
+    test.makeVectors();
+    double accuracy = em.test(test);
+
+    return accuracy;
+  }
   
   public static void main(String[] args) throws IOException {
 
     final int FOLDS = 5; // number of folds
-    final int ITERATIONS = 0; // number of iterations
     final int LABELED = 20; // number of labeled examples
     
     I2b2Dataset dataset = new I2b2Dataset();
@@ -24,7 +55,7 @@ public class EmAlgorithm {
     double cumulativeAccuracy = 0;
     
     for(int fold = 0; fold < FOLDS; fold++) {
-      
+
       Dataset labeled = new Dataset();
       Dataset unlabeled = splits[fold].getPoolSet();
       Dataset test = splits[fold].getTestSet();
@@ -35,27 +66,7 @@ public class EmAlgorithm {
       labeled.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
       labeled.makeVectors();
 
-      EmModel em = new EmModel(dataset.getLabelAlphabet());
-      em.train(labeled);
-      
-      for(int iteration = 0; iteration < ITERATIONS; iteration++) {
-        
-        // E-step
-        unlabeled.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
-        unlabeled.makeVectors();
-        em.label(unlabeled);
-
-        // M-step
-        Dataset labeledPlusUnlabeled = new Dataset(labeled.getInstances(), unlabeled.getInstances());
-        labeledPlusUnlabeled.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
-        labeledPlusUnlabeled.makeVectors();
-        em.train(labeledPlusUnlabeled);
-      }
-      
-      test.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
-      test.makeVectors();
-      double accuracy = em.test(test);
-      
+      double accuracy = EmApi.em(labeled, unlabeled, test, dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
       cumulativeAccuracy = cumulativeAccuracy + accuracy;
     }
     
