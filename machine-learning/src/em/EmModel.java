@@ -1,6 +1,5 @@
 package em;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -134,8 +133,7 @@ public class EmModel {
 			String label = labelAlphabet.getString(classIndex);
 			Float wordCount = instance.getDimensionValue(wordIndex);
 			if(wordCount != null) {
-			  float classProbability = instance.getClassProbability(label);
-				sum += wordCount * classProbability; // TODO: sometimes class Probability is not a number
+				sum += wordCount * instance.getClassProbability(label); 
 			}
 		}
 		
@@ -149,8 +147,7 @@ public class EmModel {
 		
 		double sum = 0;
 		for(int word = 0; word < numWords; word++) {
-		  double wordCount = getWordCountInClass(dataset, word, classIndex);
-		  sum += wordCount;
+		  sum += getWordCountInClass(dataset, word, classIndex);
 		}
 		
 		return sum;
