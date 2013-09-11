@@ -249,10 +249,18 @@ public class EmModel {
 
     double[] p = new double[2];
     
-    // hack
-    if((logP0 - logP1) > 300) {
-      p[0] = 1;
-      p[1] = 0;
+    // difference logP0 - logP1 larger than a few hundred causes an overflow
+    // when evaluating 10 ^ (logP0 - logP1); however the difference of that 
+    // size means that p0 is many orders of magnitude larger than p1;
+    // so we can just assume that p0 is one and p1 is zero
+    // e.g. logP0 = -1000, logP1 = -2000, logP0 - logP1 = 1000;
+    // which means that p0 / p1 is 10^1000, i.e. p0 >> p1
+    // the underflow is not an issue; e.g. 10^-1000 is just zero
+    final int MAXDIFFERENCE = 300;
+    if((logP0 - logP1) > MAXDIFFERENCE) {
+      p[0] = 1.0;
+      p[1] = 0.0;
+      
       return p;
     }
     
@@ -262,10 +270,11 @@ public class EmModel {
     p[0] = odds0 / (1 + odds0);
     p[1] = 1 / (1 + odds0);
     
-//    System.out.println(logP0 - logP1 + ", " + odds0 + ", " + Arrays.toString(p));
     assert !Double.isNaN(p[0]);
+    assert !Double.isNaN(p[1]);
+    assert !Double.isInfinite(p[0]);
     assert !Double.isInfinite(p[1]);
-    
+
     return p;
   }
   
