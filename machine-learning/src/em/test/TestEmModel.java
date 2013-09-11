@@ -1,4 +1,4 @@
-package em.implementation;
+package em.test;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -7,6 +7,7 @@ import java.util.Random;
 import data.Dataset;
 import data.I2b2Dataset;
 import data.Split;
+import em.implementation.EmModel;
 
 public class TestEmModel {
 	
