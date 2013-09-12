@@ -3,6 +3,7 @@ package cv;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -30,11 +31,11 @@ public class CrossValidation {
 	}
 
 	/**
-	 * Assign to Folds using deterministic fold assignment.
-	 * 
-	 * TODO: random currently not used; remove it;
+	 * Assign to folds using deterministic fold assignment. The returned
+	 * array contains the fold assignment. I.e. the instance i's fold is
+	 * stored in the array's ith element.
 	 */
-	public static int[] assignToFoldsDeterm(int numOfDocs, int numOfFolds, Random random) {
+	public static int[] assignToFolds(int numOfDocs, int numOfFolds) {
 		
 		int[] foldAssignment = new int[numOfDocs];
 		int currentFold = 0; // folds numbered starting from zero
@@ -104,14 +105,14 @@ public static ArrayList<Integer> getPoolDocuments(int[] foldAssignments, int tes
 	/**
 	 * Get two samples of specified sizes from a list
 	 */
-	public static ArrayList<ArrayList<Integer>> split(ArrayList<Integer> list, int size1, int size2) {
+	public static <TYPE> List<List<TYPE>> split(List<TYPE> list, int size1, int size2) {
 		
 		Collections.shuffle(list);
 		
-		ArrayList<Integer> list1 = new ArrayList<Integer>(list.subList(0, size1)); // get first size1
-		ArrayList<Integer> list2 = new ArrayList<Integer>(list.subList(size1, size1 + size2));
+		List<TYPE> list1 = new ArrayList<TYPE>(list.subList(0, size1)); 
+		List<TYPE> list2 = new ArrayList<TYPE>(list.subList(size1, size1 + size2));
 		
-		ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>(); 
+		List<List<TYPE>> result = new ArrayList<List<TYPE>>(); 
 		result.add(list1);
 		result.add(list2);
 		
@@ -120,7 +121,7 @@ public static ArrayList<Integer> getPoolDocuments(int[] foldAssignments, int tes
 	
 	public static void main(String[] args) {
 		
-		ArrayList<ArrayList<Integer>> result = split(new ArrayList<Integer>(Arrays.asList(1,2,3,4,5,6,7,8,9)), 4, 3);
+		List<List<Integer>> result = split(new ArrayList<Integer>(Arrays.asList(1,2,3,4,5,6,7,8,9,10)), 5, 5);
 		System.out.println(result.get(0));
 		System.out.println(result.get(1));
 	}
