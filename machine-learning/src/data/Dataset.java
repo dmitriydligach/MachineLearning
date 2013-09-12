@@ -310,7 +310,7 @@ public class Dataset {
 	public Split[] split(int n, Random random) {
 		
 		Split[] splits = new Split[n];
-		int[] foldAssignment = CrossValidation.assignToFoldsDeterm(instances.size(), n, random);
+		int[] foldAssignment = CrossValidation.assignToFolds(instances.size(), n);
 		
 		for(int fold = 0; fold < n; fold++) {
 			List<Instance> trainInstances = new ArrayList<Instance>();
@@ -328,6 +328,21 @@ public class Dataset {
 		}
 		
 		return splits;
+	}
+	
+	/**
+	 * Get two subsets of instances of size1 and size2. 
+	 * Wrap each subset into a Dataset object.
+	 */
+	public Dataset[] split(int size1, int size2) {
+	  
+	  List<List<Instance>> twoParts = CrossValidation.split(instances, size1, size2);
+	  Dataset[] result = new Dataset[2];
+	  
+	  result[0] = new Dataset(twoParts.get(0));
+	  result[1] = new Dataset(twoParts.get(1));
+	  
+	  return result;
 	}
 	
 	/**
