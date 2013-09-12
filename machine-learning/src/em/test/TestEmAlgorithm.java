@@ -7,7 +7,7 @@ import java.util.Random;
 import data.Dataset;
 import data.I2b2Dataset;
 import data.Split;
-import em.implementation.EmApi;
+import em.implementation.EmAlgorithm;
 
 public class TestEmAlgorithm {
 
@@ -36,7 +36,7 @@ public class TestEmAlgorithm {
       labeled.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
       labeled.makeVectors();
 
-      double accuracy = EmApi.em(labeled, 
+      double accuracy = EmAlgorithm.em(labeled, 
                                  unlabeled, 
                                  test, 
                                  dataset.getLabelAlphabet(), 

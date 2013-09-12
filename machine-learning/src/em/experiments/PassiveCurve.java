@@ -61,7 +61,7 @@ public class PassiveCurve {
 		}
 		
 		learningCurve.average();
-		learningCurve.saveAveragedCurve(Constants.outputFileRandom);
+		learningCurve.saveAveragedCurve(Constants.outputFileLabeledOnly);
 		System.out.println("random sampling done!");
 	}
 }

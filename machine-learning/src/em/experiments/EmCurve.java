@@ -8,48 +8,56 @@ import cv.LearningCurve;
 import data.Dataset;
 import data.I2b2Dataset;
 import data.Split;
-import em.implementation.EmApi;
+import em.implementation.EmAlgorithm;
 
 public class EmCurve {
 
   public static void main(String[] args) throws IOException {
 
-    final int FOLDS = 10; // number of folds
-    final int ITERATIONS = 50; // number of iterations
+    final int FOLDS = 5; // number of folds
+    final int MAXLABELED = 100; // maximum number of labeled examples
         
     I2b2Dataset dataset = new I2b2Dataset();
     dataset.loadCSVFile("/home/dima/active/ibd/data/data.txt", "/home/dima/active/ibd/data/labels-cd.txt");
     dataset.makeAlphabets();
 
     Split[] splits = dataset.split(FOLDS, new Random(100));
-    LearningCurve learningCurve = new LearningCurve();
+
+    LearningCurve labeledOnlyCurve = new LearningCurve();
+    LearningCurve labeledAndUnlabeledCurve = new LearningCurve();
     
     for(int fold = 0; fold < FOLDS; fold++) {
-      learningCurve.startNewFold();
+      
+      labeledOnlyCurve.startNewFold();
+      labeledAndUnlabeledCurve.startNewFold();
       
       Dataset labeled = new Dataset();
       Dataset nontest = splits[fold].getPoolSet();
       Dataset test = splits[fold].getTestSet();
-      Split[] parts = nontest.split(2, new Random(100));
-      Dataset pool = parts[0].getPoolSet(); // pool for labeling
-      Dataset unlabeled = parts[0].getTestSet();
-
+      
+      Dataset[] parts = nontest.split(MAXLABELED, nontest.size() - MAXLABELED);
+      Dataset pool = parts[0]; // pool for labeling
+      Dataset unlabeled = parts[1];
+      
       while(true) {
         labeled.add(pool.popRandom(1, new Random(100)));
         labeled.setInstanceClassProbabilityDistribution(new HashSet<String>(dataset.getLabelAlphabet().getStrings()));
-        
-        // are these needed?
-        labeled.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
-        labeled.makeVectors();
 
-        double accuracy = EmApi.em(labeled, 
+        double labeledOnlyAccuracy = EmAlgorithm.em(labeled, 
             unlabeled, 
             test, 
             dataset.getLabelAlphabet(), 
             dataset.getFeatureAlphabet(),
-            ITERATIONS);
+            0);
+        double labeledAndUnlabeledAccuracy = EmAlgorithm.em(labeled, 
+            unlabeled, 
+            test, 
+            dataset.getLabelAlphabet(), 
+            dataset.getFeatureAlphabet(),
+            EmAlgorithm.ITERATIONS);
         
-        learningCurve.add(labeled.size(), (float)accuracy);
+        labeledOnlyCurve.add(labeled.size(), (float)labeledOnlyAccuracy);
+        labeledAndUnlabeledCurve.add(labeled.size(), (float)labeledAndUnlabeledAccuracy);
         
         if(pool.size() == 0) {
           break;
@@ -57,8 +65,11 @@ public class EmCurve {
       }
     }
     
-    learningCurve.average();
-    learningCurve.saveAveragedCurve(Constants.outputFileActive);
+    labeledOnlyCurve.average();
+    labeledAndUnlabeledCurve.average();
+    labeledOnlyCurve.saveAveragedCurve(Constants.outputFileLabeledOnly);
+    labeledAndUnlabeledCurve.saveAveragedCurve(Constants.outputFileLabeledAndUnlabeled);
+    
     System.out.println("done!");
   }
 }

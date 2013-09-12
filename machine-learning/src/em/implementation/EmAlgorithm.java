@@ -3,8 +3,10 @@ package em.implementation;
 import data.Alphabet;
 import data.Dataset;
 
-public class EmApi {
+public class EmAlgorithm {
 
+  public static final int ITERATIONS = 50;
+  
   public static double em(Dataset labeled, 
                           Dataset unlabeled, 
                           Dataset test, 
