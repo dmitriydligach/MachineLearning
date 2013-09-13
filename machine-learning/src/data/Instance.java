@@ -80,7 +80,7 @@ public class Instance {
 	/**
 	 * Soft class assignments (e.g. obtained from a classifier).
 	 */
-	public void setClassProbabilities(Map<String, Float> classDistribution) {
+	public void setLabelProbabilityDistribution(Map<String, Float> classDistribution) {
 		
 		for(String key : classDistribution.keySet()) {
 			labels.put(key, classDistribution.get(key));

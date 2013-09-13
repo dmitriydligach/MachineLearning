@@ -7,7 +7,7 @@ public class EmAlgorithm {
 
   public static final int ITERATIONS = 50;
   
-  public static double em(Dataset labeled, 
+  public static double runAndEvaluate(Dataset labeled, 
                           Dataset unlabeled, 
                           Dataset test, 
                           Alphabet labelAlphabet, 

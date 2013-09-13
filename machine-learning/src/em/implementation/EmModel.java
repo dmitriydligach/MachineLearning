@@ -106,11 +106,11 @@ public class EmModel {
       double[] logSum = getUnnormalizedClassLogProbs(instance);
       double[] p = logToProb(logSum[0], logSum[1]); 
             
-      Map<String, Float> classDistribution = new HashMap<String, Float>();
+      Map<String, Float> labelProbabilityDistribution = new HashMap<String, Float>();
       for(int label = 0; label < numClasses; label++) {
-        classDistribution.put(labelAlphabet.getString(label), (float)p[label]);
+        labelProbabilityDistribution.put(labelAlphabet.getString(label), (float)p[label]);
       }
-      instance.setClassProbabilities(classDistribution); 
+      instance.setLabelProbabilityDistribution(labelProbabilityDistribution); 
        
       int prediction = Misc.getIndexOfLargestElement(p);
       if(prediction == labelAlphabet.getIndex(instance.getLabel())) {
