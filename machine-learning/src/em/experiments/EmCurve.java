@@ -1,7 +1,6 @@
 package em.experiments;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Random;
 
 import cv.LearningCurve;
@@ -15,7 +14,7 @@ public class EmCurve {
   public static void main(String[] args) throws IOException {
 
     final int FOLDS = 10; // number of folds
-    final int MAXLABELED = 150; // maximum number of labeled examples
+    final int MAXLABELED = 20; // maximum number of labeled examples
         
     I2b2Dataset dataset = new I2b2Dataset();
     dataset.loadCSVFile(Constants.dataFile, Constants.labelFile);
@@ -41,7 +40,6 @@ public class EmCurve {
       
       while(true) {
         labeled.add(pool.popRandom(1, new Random(100)));
-        labeled.setInstanceClassProbabilityDistribution(new HashSet<String>(dataset.getLabelAlphabet().getStrings()));
 
         // train using only labeled data
         double labeledOnlyAccuracy = EmAlgorithm.runAndEvaluate(

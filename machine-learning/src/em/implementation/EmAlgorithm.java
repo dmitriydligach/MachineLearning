@@ -1,5 +1,7 @@
 package em.implementation;
 
+import java.util.HashSet;
+
 import data.Alphabet;
 import data.Dataset;
 
@@ -14,6 +16,7 @@ public class EmAlgorithm {
                           Alphabet featureAlphabet,
                           int iterations) {
     
+    labeled.setInstanceClassProbabilityDistribution(new HashSet<String>(labelAlphabet.getStrings()));
     labeled.setAlphabets(labelAlphabet, featureAlphabet);
     labeled.makeVectors();
 
