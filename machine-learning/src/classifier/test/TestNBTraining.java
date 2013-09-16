@@ -3,9 +3,7 @@ package classifier.test;
 import java.io.IOException;
 
 import classifier.NaiveBayesClassifier;
-
 import data.Dataset;
-import data.Split;
 
 public class TestNBTraining {
 	

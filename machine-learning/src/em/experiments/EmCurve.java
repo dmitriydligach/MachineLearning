@@ -20,7 +20,7 @@ public class EmCurve {
     dataset.loadCSVFile(Constants.dataFile, Constants.labelFile);
     dataset.makeAlphabets();
 
-    Split[] splits = dataset.split(FOLDS, new Random(100));
+    Split[] splits = dataset.split(FOLDS);
 
     LearningCurve labeledOnlyCurve = new LearningCurve();
     LearningCurve labeledAndUnlabeledCurve = new LearningCurve();

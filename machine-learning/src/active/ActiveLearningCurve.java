@@ -17,7 +17,7 @@ public class ActiveLearningCurve {
 		dataset.loadCSVFile(Constants.inputFile);
 		dataset.makeAlphabets();
 		
-		Split[] splits = dataset.split(Constants.totalFolds, new Random(Constants.rndSeedForSplitting));
+		Split[] splits = dataset.split(Constants.totalFolds);
 		LearningCurve learningCurve = new LearningCurve();
 		
 		for(int fold = 0; fold < Constants.totalFolds; fold++) {

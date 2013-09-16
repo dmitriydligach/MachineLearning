@@ -1,7 +1,6 @@
 package classifier.test;
 
 import java.io.FileNotFoundException;
-import java.util.Random;
 
 import classifier.NaiveBayesClassifier;
 import data.Dataset;
@@ -19,7 +18,7 @@ public class TestI2b2Format {
 		dataset.loadCSVFile("/home/dima/active/t2d/data/data.txt", "/home/dima/active/t2d/data/labels.txt");
 		System.out.println("total instances loaded: " + dataset.size());
 		dataset.makeAlphabets();
-		Split[] splits = dataset.split(N, new Random(100));
+		Split[] splits = dataset.split(N);
 		
 		double cumulativeAccuracy = 0;
 		for(int fold = 0; fold < N; fold++) {

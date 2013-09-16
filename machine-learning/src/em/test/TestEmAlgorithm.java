@@ -21,7 +21,7 @@ public class TestEmAlgorithm {
     dataset.loadCSVFile("/home/dima/active/ibd/data/data.txt", "/home/dima/active/ibd/data/labels-cd.txt");
     dataset.makeAlphabets();
 
-    Split[] splits = dataset.split(FOLDS, new Random(100));
+    Split[] splits = dataset.split(FOLDS);
     double cumulativeAccuracy = 0;
     
     for(int fold = 0; fold < FOLDS; fold++) {

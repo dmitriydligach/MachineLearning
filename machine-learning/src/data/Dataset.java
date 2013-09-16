@@ -307,7 +307,7 @@ public class Dataset {
 	 * Split into n parts for n-fold cross-validation.
 	 * Specify the source of randomness. 
 	 */
-	public Split[] split(int n, Random random) {
+	public Split[] split(int n) {
 		
 		Split[] splits = new Split[n];
 		int[] foldAssignment = CrossValidation.assignToFolds(instances.size(), n);

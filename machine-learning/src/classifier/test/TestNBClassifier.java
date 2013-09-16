@@ -1,7 +1,6 @@
 package classifier.test;
 
 import java.io.IOException;
-import java.util.Random;
 
 import classifier.NaiveBayesClassifier;
 import data.Dataset;
@@ -17,7 +16,7 @@ public class TestNBClassifier {
 		dataset.loadCSVFile("/home/dima/i2b2/disease-activity/vectors/for-active/features.txt");
 		dataset.makeAlphabets(); // need label alphabet to init NB classifier
 		
-		Split[] splits = dataset.split(N, new Random(100));
+		Split[] splits = dataset.split(N);
 		System.out.println("done splitting");
 		
 		double cumulativeAccuracy = 0;

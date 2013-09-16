@@ -36,6 +36,7 @@ public class LibSvmTest {
 		parameter.kernel_type = svm_parameter.LINEAR;
 		parameter.C = 1;
 		
-		svm_model model = svm.svm_train(problem, parameter);
+		@SuppressWarnings("unused")
+    svm_model model = svm.svm_train(problem, parameter);
 	}
 }

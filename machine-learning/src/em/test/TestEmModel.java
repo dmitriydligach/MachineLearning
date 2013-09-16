@@ -2,7 +2,6 @@ package em.test;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Random;
 
 import data.Dataset;
 import data.I2b2Dataset;
@@ -19,7 +18,7 @@ public class TestEmModel {
 		dataset.loadCSVFile("/home/dima/active/ibd/data/data.txt", "/home/dima/active/ibd/data/labels-cd.txt");
 		dataset.makeAlphabets(); // need label alphabet to init NB classifier
 		
-		Split[] splits = dataset.split(FOLDS, new Random(100));
+		Split[] splits = dataset.split(FOLDS);
 		
 		double cumulativeAccuracy = 0;
 		for(int fold = 0; fold < FOLDS; fold++) {

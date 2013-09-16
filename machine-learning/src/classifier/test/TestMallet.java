@@ -1,7 +1,6 @@
 package classifier.test;
 
 import java.io.IOException;
-import java.util.Random;
 
 import classifier.MalletMaxEntClassifier;
 import data.Dataset;
@@ -16,7 +15,7 @@ public class TestMallet {
 		Dataset dataset = new Dataset();
 		dataset.loadCSVFile("/home/dima/i2b2/disease-activity/vectors/for-active/features.txt");
 		
-		Split[] splits = dataset.split(N, new Random(100));
+		Split[] splits = dataset.split(N);
 		System.out.println("done splitting");
 		
 		double cumulativeAccuracy = 0;

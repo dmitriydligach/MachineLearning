@@ -10,7 +10,6 @@ import cc.mallet.classify.Classifier;
 import cc.mallet.classify.MaxEntTrainer;
 import cc.mallet.pipe.Noop;
 import cc.mallet.pipe.Pipe;
-import cc.mallet.pipe.SerialPipes;
 import cc.mallet.share.upenn.MaxEntShell;
 import cc.mallet.types.FeatureVector;
 import cc.mallet.types.InstanceList;
@@ -82,9 +81,9 @@ public class MalletMaxEntClassifier {
 		
 		ArrayList<Pipe> pipeList = new ArrayList<Pipe>();
 		pipeList.add(new Noop());
-		SerialPipes serialPipe = new SerialPipes(pipeList);
+		// SerialPipes serialPipe = new SerialPipes(pipeList);
 		
-		InstanceList instanceList = new InstanceList(serialPipe);
+		// InstanceList instanceList = new InstanceList(serialPipe);
 	}
 	
 	/**
