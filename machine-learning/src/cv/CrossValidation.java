@@ -103,11 +103,11 @@ public static ArrayList<Integer> getPoolDocuments(int[] foldAssignments, int tes
 	
 	
 	/**
-	 * Get two samples of specified sizes from a list
+	 * Get two samples of specified sizes from a list. Source of randomness must be specified.
 	 */
-	public static <TYPE> List<List<TYPE>> split(List<TYPE> list, int size1, int size2) {
+	public static <TYPE> List<List<TYPE>> split(List<TYPE> list, int size1, int size2, Random random) {
 		
-		Collections.shuffle(list);
+		Collections.shuffle(list, random);
 		
 		List<TYPE> list1 = new ArrayList<TYPE>(list.subList(0, size1)); 
 		List<TYPE> list2 = new ArrayList<TYPE>(list.subList(size1, size1 + size2));
@@ -121,7 +121,7 @@ public static ArrayList<Integer> getPoolDocuments(int[] foldAssignments, int tes
 	
 	public static void main(String[] args) {
 		
-		List<List<Integer>> result = split(new ArrayList<Integer>(Arrays.asList(1,2,3,4,5,6,7,8,9,10)), 5, 5);
+		List<List<Integer>> result = split(new ArrayList<Integer>(Arrays.asList(1,2,3,4,5,6,7,8,9,10)), 5, 5, new Random(1));
 		System.out.println(result.get(0));
 		System.out.println(result.get(1));
 	}

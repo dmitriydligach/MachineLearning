@@ -333,10 +333,11 @@ public class Dataset {
 	/**
 	 * Get two subsets of instances of size1 and size2. 
 	 * Wrap each subset into a Dataset object.
+	 * Specify source of randomness.
 	 */
-	public Dataset[] split(int size1, int size2) {
+	public Dataset[] split(int size1, int size2, Random random) {
 	  
-	  List<List<Instance>> twoParts = CrossValidation.split(instances, size1, size2);
+	  List<List<Instance>> twoParts = CrossValidation.split(instances, size1, size2, random);
 	  Dataset[] result = new Dataset[2];
 	  
 	  result[0] = new Dataset(twoParts.get(0));
