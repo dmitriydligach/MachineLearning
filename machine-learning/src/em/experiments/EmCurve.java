@@ -14,7 +14,9 @@ public class EmCurve {
   public static void main(String[] args) throws IOException {
 
     final int FOLDS = 10; // number of folds
-    final int MAXLABELED = 20; // maximum number of labeled examples
+    final int MAXLABELED = 100; // maximum number of labeled examples
+    final int UNLABELED = 200;  // number of unlabeled examples
+    final Random RANDOM = new Random(100);
         
     I2b2Dataset dataset = new I2b2Dataset();
     dataset.loadCSVFile(Constants.dataFile, Constants.labelFile);
@@ -34,12 +36,12 @@ public class EmCurve {
       Dataset nontest = splits[fold].getPoolSet();
       Dataset test = splits[fold].getTestSet();
       
-      Dataset[] parts = nontest.split(MAXLABELED, nontest.size() - MAXLABELED);
+      Dataset[] parts = nontest.split(MAXLABELED, UNLABELED, RANDOM);
       Dataset pool = parts[0]; // pool for labeling of size MAXLABELED
       Dataset unlabeled = parts[1]; // unlabeled data (all nontest minus pool above)
       
       while(true) {
-        labeled.add(pool.popRandom(1, new Random(100)));
+        labeled.add(pool.popRandom(1, RANDOM));
 
         // train using only labeled data
         double labeledOnlyAccuracy = EmAlgorithm.runAndEvaluate(
