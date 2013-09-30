@@ -9,8 +9,10 @@ import data.Dataset;
 import data.Instance;
 
 /**
- * Implements a multinomial naive bayes classifier
- * as described in Nigam and Ghani (2000).
+ * Implements a multinomial naive bayes classifier as described in:
+ * 
+ * Text Classification from Labeled and Unlabeled Documents using EM (1999)
+ * Kamal Nigam, Andrew Kachites Mccallum, Sebastian Thrun, and Tom Mitchell
  * 
  * @author dmitriy dligach
  *
