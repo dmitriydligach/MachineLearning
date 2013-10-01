@@ -3,6 +3,7 @@ package em.implementation;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -109,9 +110,8 @@ public class EmModel {
     for(Instance instance : dataset.getInstances()) {
 
       double[] logSum = getUnnormalizedClassLogProbs(instance);
-      double[] p = logToProb(logSum); // for now
-      // double[] p = logToProb(logSum[0], logSum[1]); 
-            
+      double[] p = logToProb(logSum);
+      
       Map<String, Float> labelProbabilityDistribution = new HashMap<String, Float>();
       for(int label = 0; label < numClasses; label++) {
         labelProbabilityDistribution.put(labelAlphabet.getString(label), (float)p[label]);
