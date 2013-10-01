@@ -2,6 +2,7 @@ package em.implementation;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -255,8 +256,6 @@ public class EmModel {
     BigDecimal integerPart = new BigDecimal(exponentAsBigDecimal.intValue());
     BigDecimal fractionalPart = exponentAsBigDecimal.subtract(integerPart);
 
-    // BigDecimal ten = new BigDecimal(10);
-    // BigDecimal tenToIntegerPart = ten.pow(integerPart.intValue());
     BigDecimal tenToIntegerPart = new BigDecimal(BigInteger.valueOf(10), -1 * integerPart.intValue());
     BigDecimal tenToFractionalPart = new BigDecimal(Math.pow(10, fractionalPart.doubleValue()));
     
@@ -279,25 +278,19 @@ public class EmModel {
     // we have log(p(c)p(w_0|c)...p(w_n-1|c)) for each class
     // compute unnormalized probabilities as 10^(p(c)p(w_0|c)...p(w_n-1|c))
     for(int label = 0; label < numClasses; label++) {
-      
-//      BigDecimal verySmall = new BigDecimal(BigInteger.valueOf(1), 800);
-//      BigInteger unscaledValue = BigInteger.valueOf(10);
-      // int scale = Double.
-//      unnormalizedClassProbs[label] = new BigDecimal(unscaledValue, unnormalizedClassLogProbs[label]);
-      
-      
-      unnormalizedClassProbs[label] = Math.pow(10, unnormalizedClassLogProbs[label]);
-      System.out.println(unnormalizedClassLogProbs[label]);
+      unnormalizedClassProbs[label] = powerOfTen(unnormalizedClassLogProbs[label]);
+      if(unnormalizedClassProbs[label].equals(0)) {System.out.println("ZERO!");}
     }
     
     // compute the normalization constant
-    double normalizer = 0;
+    BigDecimal normalizer = new BigDecimal(0);
     for(int label = 0; label < numClasses; label++) {
-      normalizer += unnormalizedClassProbs[label];
+      normalizer = normalizer.add(unnormalizedClassProbs[label]);
     }
     
-    System.out.println(normalizer);
-    System.out.println();
+    for(int label = 0; label < numClasses; label++) {
+      p[label] = unnormalizedClassProbs[label].divide(normalizer, 6, RoundingMode.HALF_UP).doubleValue();
+    }
     
     return p;
   }

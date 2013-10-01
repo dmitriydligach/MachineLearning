@@ -14,8 +14,8 @@ public class TestEmAlgorithm {
   public static void main(String[] args) throws IOException {
 
     final int FOLDS = 5; // number of folds
-    final int LABELED = 300; // number of labeled examples
-    final int ITERATIONS = 50; // number of iterations
+    final int LABELED = 10; // number of labeled examples
+    final int ITERATIONS = 20; // number of iterations
         
     I2b2Dataset dataset = new I2b2Dataset();
     dataset.loadCSVFile("/home/dima/active/ibd/data/data.txt", "/home/dima/active/ibd/data/labels-cd.txt");
