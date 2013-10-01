@@ -1,5 +1,7 @@
 package em.implementation;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -106,7 +108,8 @@ public class EmModel {
     for(Instance instance : dataset.getInstances()) {
 
       double[] logSum = getUnnormalizedClassLogProbs(instance);
-      double[] p = logToProb(logSum[0], logSum[1]); 
+      double[] p = logToProb(logSum); // for now
+      // double[] p = logToProb(logSum[0], logSum[1]); 
             
       Map<String, Float> labelProbabilityDistribution = new HashMap<String, Float>();
       for(int label = 0; label < numClasses; label++) {
@@ -242,6 +245,64 @@ public class EmModel {
   }
 	
   /**
+   * Calculate 10^exponent when y is very small and fractional.
+   * Basically split exponent into its integer i and fractional f parts.
+   * I.e. 10^exponent = 10^(i + f) = 10^i * 10^f
+   */
+  private static BigDecimal powerOfTen(double exponent) {
+    
+    BigDecimal exponentAsBigDecimal = new BigDecimal(String.valueOf(exponent));
+    BigDecimal integerPart = new BigDecimal(exponentAsBigDecimal.intValue());
+    BigDecimal fractionalPart = exponentAsBigDecimal.subtract(integerPart);
+
+    BigDecimal ten = new BigDecimal(10);
+    BigDecimal tenToIntegerPart = ten.pow(integerPart.intValue());
+    BigDecimal tenToFractionalPart = new BigDecimal(Math.pow(10, fractionalPart.doubleValue()));
+    
+    BigDecimal result = tenToIntegerPart.multiply(tenToFractionalPart);
+    
+    return result;
+  }
+    
+  /**
+   * 
+   */
+  public double[] logToProb(double[] unnormalizedClassLogProbs) {
+   
+    double[] p = new double[unnormalizedClassLogProbs.length];
+    
+    // unnormalized probabilities are often very small, e.g. 10^-800
+    // which causes an underflow, so need to use big decimal instead
+//    BigDecimal[] unnormalizedClassProbs = new BigDecimal[unnormalizedClassLogProbs.length];
+    double[] unnormalizedClassProbs = new double[unnormalizedClassLogProbs.length];
+    
+    // we have log(p(c)p(w_0|c)...p(w_n-1|c)) for each class
+    // represent unnormalized probabilities as 10^(p(c)p(w_0|c)...p(w_n-1|c))
+    for(int label = 0; label < numClasses; label++) {
+      
+//      BigDecimal verySmall = new BigDecimal(BigInteger.valueOf(1), 800);
+//      BigInteger unscaledValue = BigInteger.valueOf(10);
+      // int scale = Double.
+//      unnormalizedClassProbs[label] = new BigDecimal(unscaledValue, unnormalizedClassLogProbs[label]);
+      
+      
+      unnormalizedClassProbs[label] = Math.pow(10, unnormalizedClassLogProbs[label]);
+      System.out.println(unnormalizedClassLogProbs[label]);
+    }
+    
+    // compute the normalization constant
+    double normalizer = 0;
+    for(int label = 0; label < numClasses; label++) {
+      normalizer += unnormalizedClassProbs[label];
+    }
+    
+    System.out.println(normalizer);
+    System.out.println();
+    
+    return p;
+  }
+  
+  /**
    * Convert two unnormalized log probs to probabilities.
    * TODO: rewrite this method for the multi-class scenario
    */
@@ -256,6 +317,7 @@ public class EmModel {
     // e.g. logP0 = -1000, logP1 = -2000, logP0 - logP1 = 1000;
     // which means that p0 / p1 is 10^1000, i.e. p0 >> p1
     // the underflow is not an issue; e.g. 10^-1000 is just zero
+    // TODO: can use Double.MAX_VALUE instead of 300
     final int MAXDIFFERENCE = 300;
     if((logP0 - logP1) > MAXDIFFERENCE) {
       p[0] = 1.0;
