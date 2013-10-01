@@ -255,8 +255,9 @@ public class EmModel {
     BigDecimal integerPart = new BigDecimal(exponentAsBigDecimal.intValue());
     BigDecimal fractionalPart = exponentAsBigDecimal.subtract(integerPart);
 
-    BigDecimal ten = new BigDecimal(10);
-    BigDecimal tenToIntegerPart = ten.pow(integerPart.intValue());
+    // BigDecimal ten = new BigDecimal(10);
+    // BigDecimal tenToIntegerPart = ten.pow(integerPart.intValue());
+    BigDecimal tenToIntegerPart = new BigDecimal(BigInteger.valueOf(10), -1 * integerPart.intValue());
     BigDecimal tenToFractionalPart = new BigDecimal(Math.pow(10, fractionalPart.doubleValue()));
     
     BigDecimal result = tenToIntegerPart.multiply(tenToFractionalPart);
@@ -271,13 +272,12 @@ public class EmModel {
    
     double[] p = new double[unnormalizedClassLogProbs.length];
     
-    // unnormalized probabilities are often very small, e.g. 10^-800
+    // unnormalized probabilities are often very small, e.g. 10^-802.345
     // which causes an underflow, so need to use big decimal instead
-//    BigDecimal[] unnormalizedClassProbs = new BigDecimal[unnormalizedClassLogProbs.length];
-    double[] unnormalizedClassProbs = new double[unnormalizedClassLogProbs.length];
-    
+    BigDecimal[] unnormalizedClassProbs = new BigDecimal[unnormalizedClassLogProbs.length];
+      
     // we have log(p(c)p(w_0|c)...p(w_n-1|c)) for each class
-    // represent unnormalized probabilities as 10^(p(c)p(w_0|c)...p(w_n-1|c))
+    // compute unnormalized probabilities as 10^(p(c)p(w_0|c)...p(w_n-1|c))
     for(int label = 0; label < numClasses; label++) {
       
 //      BigDecimal verySmall = new BigDecimal(BigInteger.valueOf(1), 800);
