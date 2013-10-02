@@ -297,8 +297,8 @@ public class EmModel {
   
   /**
    * Convert two unnormalized log probs to probabilities.
-   * TODO: rewrite this method for the multi-class scenario
    */
+  @Deprecated
   public double[] logToProb(double logP0, double logP1) {
 
     double[] p = new double[2];
