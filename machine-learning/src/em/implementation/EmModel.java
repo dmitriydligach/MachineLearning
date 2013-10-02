@@ -287,7 +287,7 @@ public class EmModel {
     }
     
     for(int label = 0; label < numClasses; label++) {
-      probs[label] = unnormalizedClassProbs[label].divide(normalizer, 6, RoundingMode.HALF_UP).doubleValue();
+      probs[label] = unnormalizedClassProbs[label].divide(normalizer, RoundingMode.HALF_UP).doubleValue();
     }
     
     return probs;
@@ -335,7 +335,6 @@ public class EmModel {
    * Classify a document using a multinomial naive bayes model. 
    */
   public int classify(Instance instance) {
-    double[] classLogProbs = getUnnormalizedClassLogProbs(instance);
-    return Misc.getIndexOfLargestElement(classLogProbs);
+    return Misc.getIndexOfLargestElement(getUnnormalizedClassLogProbs(instance));
   }
 }
