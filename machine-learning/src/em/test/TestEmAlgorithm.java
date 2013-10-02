@@ -12,15 +12,16 @@ import em.implementation.EmAlgorithm;
 
 public class TestEmAlgorithm {
 
-  final static int NUMBEROFFOLDS = 10; 
+  final static int FOLDS = 10; 
+  final static int EMITERATIONS = 50;
 
   public static void main(String[] args) throws IOException {
     
-    int numberOfLabeledExamples = 20;
-    double labeledOnlyAccuracy = testEm(numberOfLabeledExamples, 0);
-    double labeledAndUnlabeledAccuracy = testEm(10, 50);
-    
-    System.out.println(labeledOnlyAccuracy + " vs. " + labeledAndUnlabeledAccuracy);
+    for(int numberOfLabeledExamples = 5; numberOfLabeledExamples < 100; numberOfLabeledExamples += 5) {
+      double labeledOnlyAccuracy = testEm(numberOfLabeledExamples, 0);
+      double labeledAndUnlabeledAccuracy = testEm(numberOfLabeledExamples, EMITERATIONS);
+      System.out.format("%d: %.3f vs %.3f\n", numberOfLabeledExamples, labeledOnlyAccuracy, labeledAndUnlabeledAccuracy);
+    }
   }
   
   public static double testEm(int numberOfLabeledExamples, int iterations) throws FileNotFoundException {
@@ -29,10 +30,10 @@ public class TestEmAlgorithm {
     dataset.loadCSVFile("/home/dima/active/ibd/data/data.txt", "/home/dima/active/ibd/data/labels-cd.txt");
     dataset.makeAlphabets();
 
-    Split[] splits = dataset.split(NUMBEROFFOLDS);
+    Split[] splits = dataset.split(FOLDS);
     double cumulativeAccuracy = 0;
 
-    for(int fold = 0; fold < NUMBEROFFOLDS; fold++) {
+    for(int fold = 0; fold < FOLDS; fold++) {
 
       Dataset labeled = new Dataset();
       Dataset unlabeled = splits[fold].getPoolSet();
@@ -54,7 +55,7 @@ public class TestEmAlgorithm {
       cumulativeAccuracy = cumulativeAccuracy + accuracy;
     }
 
-    double averageAccuracy = cumulativeAccuracy / NUMBEROFFOLDS;
+    double averageAccuracy = cumulativeAccuracy / FOLDS;
     
     return averageAccuracy;
   }
