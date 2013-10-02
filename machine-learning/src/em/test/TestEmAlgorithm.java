@@ -14,13 +14,14 @@ public class TestEmAlgorithm {
 
   final static int FOLDS = 10; 
   final static int EMITERATIONS = 50;
+  final static int STEP = 3;
 
   public static void main(String[] args) throws IOException {
     
-    for(int numberOfLabeledExamples = 5; numberOfLabeledExamples < 100; numberOfLabeledExamples += 5) {
+    for(int numberOfLabeledExamples = STEP; numberOfLabeledExamples < 150; numberOfLabeledExamples += STEP) {
       double labeledOnlyAccuracy = testEm(numberOfLabeledExamples, 0);
       double labeledAndUnlabeledAccuracy = testEm(numberOfLabeledExamples, EMITERATIONS);
-      System.out.format("%d: %.3f vs %.3f\n", numberOfLabeledExamples, labeledOnlyAccuracy, labeledAndUnlabeledAccuracy);
+      System.out.format("%d %.4f %.4f\n", numberOfLabeledExamples, labeledOnlyAccuracy, labeledAndUnlabeledAccuracy);
     }
   }
   
