@@ -264,11 +264,11 @@ public class EmModel {
   }
     
   /**
-   * 
+   * Convert unnormalized log probabilities to probabilities for each class.
    */
   public double[] logToProb(double[] unnormalizedClassLogProbs) {
    
-    double[] p = new double[unnormalizedClassLogProbs.length];
+    double[] probs = new double[unnormalizedClassLogProbs.length];
     
     // unnormalized probabilities are often very small, e.g. 10^-802.345
     // which causes an underflow, so need to use big decimal instead
@@ -278,7 +278,6 @@ public class EmModel {
     // compute unnormalized probabilities as 10^(p(c)p(w_0|c)...p(w_n-1|c))
     for(int label = 0; label < numClasses; label++) {
       unnormalizedClassProbs[label] = powerOfTen(unnormalizedClassLogProbs[label]);
-      if(unnormalizedClassProbs[label].equals(0)) {System.out.println("ZERO!");}
     }
     
     // compute the normalization constant
@@ -288,10 +287,10 @@ public class EmModel {
     }
     
     for(int label = 0; label < numClasses; label++) {
-      p[label] = unnormalizedClassProbs[label].divide(normalizer, 6, RoundingMode.HALF_UP).doubleValue();
+      probs[label] = unnormalizedClassProbs[label].divide(normalizer, 6, RoundingMode.HALF_UP).doubleValue();
     }
     
-    return p;
+    return probs;
   }
   
   /**

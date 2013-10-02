@@ -41,6 +41,6 @@ public class TestEmModel {
 		}
 		
 		double accuracy = cumulativeAccuracy / FOLDS;
-		System.out.println("average accuracy:\t" + accuracy);
+		System.out.format("%d-fold cv accuracy: %.4f\n", FOLDS, accuracy);
 	}
 }
