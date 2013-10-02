@@ -10,13 +10,13 @@ import data.I2b2Dataset;
 import data.Split;
 import em.implementation.EmAlgorithm;
 
-public class EmTestWrapper {
+public class TestEmAlgorithm {
 
   final static int NUMBEROFFOLDS = 10; 
 
   public static void main(String[] args) throws IOException {
     
-    int numberOfLabeledExamples = 15;
+    int numberOfLabeledExamples = 20;
     double labeledOnlyAccuracy = testEm(numberOfLabeledExamples, 0);
     double labeledAndUnlabeledAccuracy = testEm(10, 50);
     
