@@ -16,7 +16,8 @@ public class EmTestWrapper {
 
   public static void main(String[] args) throws IOException {
     
-    double labeledOnlyAccuracy = testEm(10, 0);
+    int numberOfLabeledExamples = 15;
+    double labeledOnlyAccuracy = testEm(numberOfLabeledExamples, 0);
     double labeledAndUnlabeledAccuracy = testEm(10, 50);
     
     System.out.println(labeledOnlyAccuracy + " vs. " + labeledAndUnlabeledAccuracy);
