@@ -14,6 +14,9 @@ public class TestEmAlgorithm {
 
   final static int FOLDS = 10; 
   final static int STEP = 3;
+  
+  static final String DATAFILE = "/home/dima/active/ms/data/data.txt";
+  static final String LABELFILE = "/home/dima/active/ms/data/labels.txt";
 
   public static void main(String[] args) throws IOException {
     
@@ -27,7 +30,7 @@ public class TestEmAlgorithm {
   public static double testEm(int numberOfLabeledExamples, int iterations) throws FileNotFoundException {
 
     I2b2Dataset dataset = new I2b2Dataset();
-    dataset.loadCSVFile("/home/dima/active/ibd/data/data.txt", "/home/dima/active/ibd/data/labels-cd.txt");
+    dataset.loadCSVFile(DATAFILE, LABELFILE);
     dataset.makeAlphabets();
 
     Split[] splits = dataset.split(FOLDS);
