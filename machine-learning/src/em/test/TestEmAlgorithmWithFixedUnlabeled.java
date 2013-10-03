@@ -14,7 +14,7 @@ public class TestEmAlgorithmWithFixedUnlabeled {
   final static int FOLDS = 10; 
   final static int MAXLABELED = 150;
   final static int UNLABELED = 390;
-  final static int STEP = 5;
+  final static int STEP = 2;
   
   static final String DATAFILE = "/home/dima/active/ibd/data/data.txt";
   static final String LABELFILE = "/home/dima/active/ibd/data/labels-cd.txt";

@@ -43,8 +43,6 @@ public class TestEmAlgorithm {
       Dataset test = splits[fold].getTestSet();
 
       labeled.add(unlabeled.popRandom(numberOfLabeledExamples, new Random(100)));
-      // labeled.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
-      // labeled.makeVectors();
 
       double accuracy = EmAlgorithm.runAndEvaluate(
           labeled, 
