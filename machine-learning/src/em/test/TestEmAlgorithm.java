@@ -13,6 +13,7 @@ import em.implementation.EmAlgorithm;
 public class TestEmAlgorithm {
 
   final static int FOLDS = 10; 
+  final static int MAXLABELED = 150;
   final static int STEP = 3;
   
   static final String DATAFILE = "/home/dima/active/ms/data/data.txt";
@@ -20,7 +21,7 @@ public class TestEmAlgorithm {
 
   public static void main(String[] args) throws IOException {
     
-    for(int numberOfLabeledExamples = STEP; numberOfLabeledExamples < 150; numberOfLabeledExamples += STEP) {
+    for(int numberOfLabeledExamples = STEP; numberOfLabeledExamples < MAXLABELED; numberOfLabeledExamples += STEP) {
       double labeledOnlyAccuracy = testEm(numberOfLabeledExamples, 0);
       double labeledAndUnlabeledAccuracy = testEm(numberOfLabeledExamples, EmAlgorithm.ITERATIONS);
       System.out.format("%d %.4f %.4f\n", numberOfLabeledExamples, labeledOnlyAccuracy, labeledAndUnlabeledAccuracy);
