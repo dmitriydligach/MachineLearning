@@ -2,7 +2,6 @@ package em.test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Random;
 
 import data.Dataset;
@@ -14,10 +13,10 @@ public class TestEmAlgorithm {
 
   final static int FOLDS = 10; 
   final static int MAXLABELED = 150;
-  final static int STEP = 3;
+  final static int STEP = 5;
   
-  static final String DATAFILE = "/home/dima/active/ms/data/data.txt";
-  static final String LABELFILE = "/home/dima/active/ms/data/labels.txt";
+  static final String DATAFILE = "/home/dima/active/ibd/data/data.txt";
+  static final String LABELFILE = "/home/dima/active/ibd/data/labels-cd.txt";
 
   public static void main(String[] args) throws IOException {
     
@@ -44,10 +43,8 @@ public class TestEmAlgorithm {
       Dataset test = splits[fold].getTestSet();
 
       labeled.add(unlabeled.popRandom(numberOfLabeledExamples, new Random(100)));
-      labeled.setInstanceClassProbabilityDistribution(new HashSet<String>(dataset.getLabelAlphabet().getStrings()));
-
-      labeled.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
-      labeled.makeVectors();
+      // labeled.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
+      // labeled.makeVectors();
 
       double accuracy = EmAlgorithm.runAndEvaluate(
           labeled, 
