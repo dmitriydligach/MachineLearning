@@ -12,10 +12,12 @@ public class TestEmModel {
 	
 	public static void main(String[] args) throws IOException {
 
-		final int FOLDS = 5; // number of folds
+		final int FOLDS = 10; // number of folds
+	  final String DATAFILE = "/home/dima/active/ms/data/data.txt";
+	  final String LABELFILE = "/home/dima/active/ms/data/labels.txt";
 		
 		I2b2Dataset dataset = new I2b2Dataset();
-		dataset.loadCSVFile("/home/dima/active/ibd/data/data.txt", "/home/dima/active/ibd/data/labels-cd.txt");
+		dataset.loadCSVFile(DATAFILE, LABELFILE);
 		dataset.makeAlphabets(); // need label alphabet to init NB classifier
 		
 		Split[] splits = dataset.split(FOLDS);
