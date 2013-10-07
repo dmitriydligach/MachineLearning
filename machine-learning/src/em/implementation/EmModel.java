@@ -192,10 +192,10 @@ public class EmModel {
    * Calculate for each class:
    * 
    * p(c|w_0, ..., w_n-1) ~ p(c)p(w_0|c)p(w_1|c)...p(w_n-1|c)
-   *   where w_0, ..., w_n-1 are word tokens in the document
+   * where w_0, ..., w_n-1 are words in the document in positions w_0, ..., w_n-1.
    *   
    * Calculations are done in log space. I.e. we need to calculate:
-   * log(p(c)p(w_0|c)...p(w_n-1|c)) = log(p(c)) + log(p(w_0|c)) + ... + log(p(w_n-1|c))
+   * log[p(c)p(w_0|c)...p(w_n-1|c)] = log[p(c)] + log[p(w_0|c)] + ... + log[p(w_n-1|c)]
    * 
    * OOV words (i.e. words not seen during training) are currently ignored.
    * 
