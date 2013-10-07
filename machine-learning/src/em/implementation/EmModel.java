@@ -67,7 +67,7 @@ public class EmModel {
    * Calculate p(w|c) for all words in training data 
    * and for each class. Based on equation 5 in the paper.
    */
-  public void computeTheta(Dataset dataset) {
+  private void computeTheta(Dataset dataset) {
     
     // precompute total word count in each class
     double[] totalWordCountInClass = new double[numClasses];
@@ -92,7 +92,7 @@ public class EmModel {
   /**
    * Compute the sum from the denominator of Equation 5. 
    */
-  public double getTotalWordCountInClass(Dataset dataset, int classIndex) {
+  private double getTotalWordCountInClass(Dataset dataset, int classIndex) {
     
     double sum = 0;
     for(int word = 0; word < numWords; word++) {
@@ -105,7 +105,7 @@ public class EmModel {
   /**
    * Compute the sum from the numerator of Equation 5.
    */
-  public double getWordCountInClass(Dataset dataset, int wordIndex, int classIndex) {
+  private double getWordCountInClass(Dataset dataset, int wordIndex, int classIndex) {
     
     double sum = 0;
     for(Instance instance : dataset.getInstances()) {
@@ -120,11 +120,12 @@ public class EmModel {
   }
   
   /**
-   * Equation 2.
+   * Compute p(c) for each class. Basedon on Equation 6 in the paper.
    */
-  public void computePriors(Dataset dataset) {
+  private void computePriors(Dataset dataset) {
     
     for(int classIndex = 0; classIndex < numClasses; classIndex++) {
+      
       double sum = 0;
       for(Instance instance : dataset.getInstances()) {
         String label = labelAlphabet.getString(classIndex);
