@@ -50,12 +50,13 @@ public class EmModel {
 	  this.labelAlphabet = labelAlphabet;
 	}
 	
-	 /**
-   * Initialize various counts needed for training.
-   * Assumes alphabet and vectors are generated for the dataset.
+  /**
+   * Train a model using a dataset. 
+   * Assume alphabet and vectors have been generated for this dataset. 
    */
-  protected void initialize(Dataset dataset) {
-    
+  public void train(Dataset dataset) {
+
+    // init counts and data structures needed for training
     numClasses = labelAlphabet.size();
     numWords = dataset.getNumberOfDimensions();
     numInstances = dataset.size();
@@ -64,15 +65,7 @@ public class EmModel {
     
     priors = new double[numClasses];
     theta = new double[numClasses][numWords];
-  }	
-	
-  
-  /**
-   * Train a model ...
-   */
-  public void train(Dataset dataset) {
-    
-    initialize(dataset);
+ 
     computeTotalClassWords(dataset); 
     computeTheta(dataset);
     computePriors(dataset);
