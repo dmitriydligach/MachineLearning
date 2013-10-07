@@ -22,16 +22,11 @@ import data.Instance;
  */
 public class EmModel {
 
-  // number of classes
+  // number of classes in training and test data
   protected int numClasses;
-  // number of words (features)
+  // number of words (features) in training data
   protected int numWords;
-  // number of examples in training data
-  protected int numInstances;
   
-  // total word (feature) count in each class
-  private double[] totalClassWords;
-
   // p(w|c) for all classes 
   protected double[][] theta;
   // p(c) for all classes
@@ -51,26 +46,98 @@ public class EmModel {
 	}
 	
   /**
-   * Train a model using a dataset. 
-   * Assume alphabet and vectors have been generated for this dataset. 
+   * Initialize various counts and data structures 
+   * needed for training and train a model using a dataset. 
+   * Assume alphabet and vectors have been generated for the dataset. 
    */
   public void train(Dataset dataset) {
 
     // init counts and data structures needed for training
     numClasses = labelAlphabet.size();
     numWords = dataset.getNumberOfDimensions();
-    numInstances = dataset.size();
-    
-    totalClassWords = new double[numClasses];
     
     priors = new double[numClasses];
     theta = new double[numClasses][numWords];
- 
-    computeTotalClassWords(dataset); 
+    
     computeTheta(dataset);
     computePriors(dataset);
   }
   
+  /**
+   * Calculate p(w|c) for all words in training data 
+   * and for each class. Based on equation 5 in the paper.
+   */
+  public void computeTheta(Dataset dataset) {
+    
+    // precompute total word count in each class
+    double[] totalWordCountInClass = new double[numClasses];
+    for(int label = 0; label < numClasses; label++) {
+      totalWordCountInClass[label] = getTotalWordCountInClass(dataset, label);
+    }
+  
+    // calculcate p(w|c) for each word in each class
+    for(int label = 0; label < numClasses; label++) {
+      for(int word = 0; word < numWords; word++) {
+        
+        theta[label][word] = 
+            (1 + getWordCountInClass(dataset, word, label)) / 
+            (numWords + totalWordCountInClass[label]);
+        
+        assert !Double.isNaN(theta[label][word]);
+        assert !Double.isInfinite(theta[label][word]);
+      }
+    }
+  }
+  
+  /**
+   * Compute the sum from the denominator of Equation 5. 
+   */
+  public double getTotalWordCountInClass(Dataset dataset, int classIndex) {
+    
+    double sum = 0;
+    for(int word = 0; word < numWords; word++) {
+      sum += getWordCountInClass(dataset, word, classIndex);
+    }
+    
+    return sum;
+  }
+
+  /**
+   * Compute the sum from the numerator of Equation 5.
+   */
+  public double getWordCountInClass(Dataset dataset, int wordIndex, int classIndex) {
+    
+    double sum = 0;
+    for(Instance instance : dataset.getInstances()) {
+      String label = labelAlphabet.getString(classIndex);
+      Float wordCount = instance.getDimensionValue(wordIndex); // null if count = 0 for this word
+      if(wordCount != null) {
+        sum += wordCount * instance.getClassProbability(label); 
+      }
+    }
+    
+    return sum;
+  }
+  
+  /**
+   * Equation 2.
+   */
+  public void computePriors(Dataset dataset) {
+    
+    for(int classIndex = 0; classIndex < numClasses; classIndex++) {
+      double sum = 0;
+      for(Instance instance : dataset.getInstances()) {
+        String label = labelAlphabet.getString(classIndex);
+        sum += instance.getClassProbability(label);
+      }
+      
+      priors[classIndex] = (1 + sum) / (numClasses + dataset.size());
+      
+      assert !Double.isNaN(priors[classIndex]);
+      assert !Double.isInfinite(priors[classIndex]);
+    }
+  }
+
   /**
    * Classify instances in a dataset. Return accuracy.
    */
@@ -119,84 +186,7 @@ public class EmModel {
 
     return (double) correct / total;
   }
-
-	
-	/**
-	 * Sum from the numerator from equation 1.
-	 */
-	public double getWordCountInClass(Dataset dataset, int wordIndex, int classIndex) {
-		
-		double sum = 0;
-		for(Instance instance : dataset.getInstances()) {
-			String label = labelAlphabet.getString(classIndex);
-			Float wordCount = instance.getDimensionValue(wordIndex);
-			if(wordCount != null) {
-				sum += wordCount * instance.getClassProbability(label); 
-			}
-		}
-		
-		return sum;
-	}
-	
-	/**
-	 * Sum from the denominator from equation 1 
-	 */
-	public double getTotalWordCountInClass(Dataset dataset, int classIndex) {
-		
-		double sum = 0;
-		for(int word = 0; word < numWords; word++) {
-		  sum += getWordCountInClass(dataset, word, classIndex);
-		}
-		
-		return sum;
-	}
-	
-	/**
-	 * 
-	 */
-	public void computeTotalClassWords(Dataset dataset) {
-
-		for(int label = 0; label < numClasses; label++) {
-			totalClassWords[label] = getTotalWordCountInClass(dataset, label);
-		}
-	}
-	
-	/**
-	 * Equation 1.
-	 */
-	public void computeTheta(Dataset dataset) {
-		
-		for(int label = 0; label < numClasses; label++) {
-			for(int word = 0; word < numWords; word++) {
-				theta[label][word] = 
-						(1 + getWordCountInClass(dataset, word, label)) / 
-						(numWords + totalClassWords[label]);
-				
-				assert !Double.isNaN(theta[label][word]);
-				assert !Double.isInfinite(theta[label][word]);
-			}
-		}
-	}
-	
-	/**
-	 * Equation 2.
-	 */
-	public void computePriors(Dataset dataset) {
-		
-		for(int classIndex = 0; classIndex < numClasses; classIndex++) {
-		  double sum = 0;
-			for(Instance instance : dataset.getInstances()) {
-				String label = labelAlphabet.getString(classIndex);
-				sum += instance.getClassProbability(label);
-			}
 			
-			priors[classIndex] = (1 + sum) / (numClasses + numInstances);
-			
-			assert !Double.isNaN(priors[classIndex]);
-			assert !Double.isInfinite(priors[classIndex]);
-		}
-	}
-	
 	 /**
    * Calculate for each class:
    * 
