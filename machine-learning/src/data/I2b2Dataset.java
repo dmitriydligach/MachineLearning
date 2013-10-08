@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 public class I2b2Dataset extends Dataset {
 
@@ -86,5 +87,17 @@ public class I2b2Dataset extends Dataset {
 		}
 		
 		return patientNumToLabel;
+	}
+	
+	/**
+	 * Replace all instances whose label is in a set by another label.
+	 */
+	public void mapLabels(Set<String> from, String to) {
+	  
+	  for(Instance instance : instances) {
+	    if(from.contains(instance.getLabel())) {
+	      instance.setLabel(to);
+	    }
+	  }
 	}
 }
