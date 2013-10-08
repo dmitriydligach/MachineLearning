@@ -7,8 +7,6 @@ import data.Dataset;
 
 public class EmAlgorithm {
 
-  public static final int ITERATIONS = 50;
-  
   public static double runAndEvaluate(Dataset labeled, 
                           Dataset unlabeled, 
                           Dataset test, 

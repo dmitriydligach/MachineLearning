@@ -12,18 +12,14 @@ public class TestEmModel {
 	
 	public static void main(String[] args) throws IOException {
 
-		final int FOLDS = 10; // number of folds
-	  final String DATAFILE = "/home/dima/active/ms/data/data.txt";
-	  final String LABELFILE = "/home/dima/active/ms/data/labels.txt";
-		
 		I2b2Dataset dataset = new I2b2Dataset();
-		dataset.loadCSVFile(DATAFILE, LABELFILE);
+		dataset.loadCSVFile(Constants.DATAFILE, Constants.LABELFILE);
 		dataset.makeAlphabets(); // need label alphabet to init NB classifier
 		
-		Split[] splits = dataset.split(FOLDS);
+		Split[] splits = dataset.split(Constants.FOLDS);
 		
 		double cumulativeAccuracy = 0;
-		for(int fold = 0; fold < FOLDS; fold++) {
+		for(int fold = 0; fold < Constants.FOLDS; fold++) {
 			Dataset trainSet = splits[fold].getPoolSet();
 			Dataset testSet = splits[fold].getTestSet();
 			
@@ -42,7 +38,7 @@ public class TestEmModel {
 			cumulativeAccuracy = cumulativeAccuracy + accuracy;
 		}
 		
-		double accuracy = cumulativeAccuracy / FOLDS;
-		System.out.format("%d-fold cv accuracy: %.4f\n", FOLDS, accuracy);
+		double accuracy = cumulativeAccuracy / Constants.FOLDS;
+		System.out.format("%d-fold cv accuracy: %.4f\n", Constants.FOLDS, accuracy);
 	}
 }

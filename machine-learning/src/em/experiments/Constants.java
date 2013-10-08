@@ -7,4 +7,6 @@ public class Constants {
 	
 	public static final String outputFileLabeledOnly = "/home/dima/temp/labeled.txt";
 	public static final String outputFileLabeledAndUnlabeled = "/home/dima/temp/em.txt";
+	
+	public static final int ITERATIONS = 50;
 }

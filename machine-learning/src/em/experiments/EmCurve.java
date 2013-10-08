@@ -59,7 +59,7 @@ public class EmCurve {
             test, 
             dataset.getLabelAlphabet(), 
             dataset.getFeatureAlphabet(),
-            EmAlgorithm.ITERATIONS);
+            Constants.ITERATIONS);
         
         labeledOnlyCurve.add(labeled.size(), (float)labeledOnlyAccuracy);
         labeledAndUnlabeledCurve.add(labeled.size(), (float)labeledAndUnlabeledAccuracy);

@@ -11,32 +11,25 @@ import em.implementation.EmAlgorithm;
 
 public class TestEmAlgorithm {
 
-  final static int FOLDS = 10; 
-  final static int MAXLABELED = 150;
-  final static int STEP = 5;
-  
-  static final String DATAFILE = "/home/dima/active/ibd/data/data.txt";
-  static final String LABELFILE = "/home/dima/active/ibd/data/labels-cd.txt";
-
   public static void main(String[] args) throws IOException {
     
-    for(int numberOfLabeledExamples = STEP; numberOfLabeledExamples < MAXLABELED; numberOfLabeledExamples += STEP) {
-      double labeledOnlyAccuracy = testEm(numberOfLabeledExamples, 0);
-      double labeledAndUnlabeledAccuracy = testEm(numberOfLabeledExamples, EmAlgorithm.ITERATIONS);
-      System.out.format("%d %.4f %.4f\n", numberOfLabeledExamples, labeledOnlyAccuracy, labeledAndUnlabeledAccuracy);
+    for(int numLabeled = Constants.STEP; numLabeled < Constants.MAXLABELED; numLabeled += Constants.STEP) {
+      double labeledOnlyAccuracy = testEm(numLabeled, 0);
+      double labeledAndUnlabeledAccuracy = testEm(numLabeled, Constants.ITERATIONS);
+      System.out.format("%d %.4f %.4f\n", numLabeled, labeledOnlyAccuracy, labeledAndUnlabeledAccuracy);
     }
   }
   
   public static double testEm(int numberOfLabeledExamples, int iterations) throws FileNotFoundException {
 
     I2b2Dataset dataset = new I2b2Dataset();
-    dataset.loadCSVFile(DATAFILE, LABELFILE);
+    dataset.loadCSVFile(Constants.DATAFILE, Constants.LABELFILE);
     dataset.makeAlphabets();
 
-    Split[] splits = dataset.split(FOLDS);
+    Split[] splits = dataset.split(Constants.FOLDS);
     double cumulativeAccuracy = 0;
 
-    for(int fold = 0; fold < FOLDS; fold++) {
+    for(int fold = 0; fold < Constants.FOLDS; fold++) {
 
       Dataset labeled = new Dataset();
       Dataset unlabeled = splits[fold].getPoolSet();
@@ -54,7 +47,7 @@ public class TestEmAlgorithm {
       cumulativeAccuracy = cumulativeAccuracy + accuracy;
     }
 
-    double averageAccuracy = cumulativeAccuracy / FOLDS;
+    double averageAccuracy = cumulativeAccuracy / Constants.FOLDS;
     
     return averageAccuracy;
   }
