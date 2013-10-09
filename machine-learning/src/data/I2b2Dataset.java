@@ -2,9 +2,13 @@ package data;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -69,6 +73,69 @@ public class I2b2Dataset extends Dataset {
       }
     }
 	}
+	
+	 /**
+   * Load n unlabeled instances from a comma-separated file. Skip the vectors
+   * that have labels. If more than n examples exist, select n at random.
+   */
+  public void loadFromCSVFile(String vectorFile, String labelFile, int n) throws FileNotFoundException {
+    
+    HashSet<String> patientNumsProcessed = new HashSet<String>();
+    Map<String, String> patientNumToLabel = loadLabels(labelFile);
+    File file = new File(vectorFile);
+    Scanner scan = new Scanner(file);
+    List<Instance> unlabeledInstances = new LinkedList<Instance>();
+    String[] columns = null;
+    
+    while(scan.hasNextLine()) {
+      String line = scan.nextLine();
+
+      // skip comments and empty lines
+      if(line.startsWith("#") || line.length() == 0) {
+        continue;
+      }
+      
+      // read the line containing column names
+      if(line.startsWith("patient_num")) {
+        columns = line.split("\\|");
+        continue;
+      }
+      
+      // now read the data
+      String[] elements = line.split(",");
+      String patientNum = elements[0];
+      
+      // skip vectors that have labels
+      if(patientNumToLabel.containsKey(patientNum)) {
+        continue;
+      }
+        
+      // only store each patient once
+      if(patientNumsProcessed.contains(patientNum)) {
+        continue;
+      } else {
+        patientNumsProcessed.add(patientNum);
+      }
+
+      Instance instance = new Instance();
+      instance.setLabel(null);
+
+      // iterate over vector elements
+      for(int i = 1; i < elements.length; i++) {
+        String feature = columns[i];
+        Float value = Float.parseFloat(elements[i]);
+        if(value != 0.0) {
+          instance.addFeature(feature, value);
+        }
+      }
+
+      unlabeledInstances.add(instance);
+    }
+    
+    // select a random sample of n examples
+    Collections.shuffle(unlabeledInstances, new Random(100));
+    this.instances = unlabeledInstances.subList(0, n);
+  }
 	
 	/**
 	 * Load labels from a comma-separated file: <patient_num>,<label>.
