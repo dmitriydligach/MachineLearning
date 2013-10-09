@@ -161,6 +161,10 @@ public class EmModel {
 	/**
    * Classify instances in a dataset. Also set probability distribution
    * over classes for each instance. Return accuracy.
+   * 
+   * TODO: Probably don't need to calc accuracy here
+   * TODO: also figure out a better way to handle null labels
+   * TODO: when creating a new instance, set label to null, not ""
    */
   public double label(Dataset dataset) {
     
@@ -179,7 +183,7 @@ public class EmModel {
       instance.setLabelProbabilityDistribution(labelProbabilityDistribution); 
        
       int prediction = Misc.getIndexOfLargestElement(p);
-      if(prediction == labelAlphabet.getIndex(instance.getLabel())) {
+      if(instance.getLabel() != null && prediction == labelAlphabet.getIndex(instance.getLabel())) {
         correct++;
       }
       total++;
