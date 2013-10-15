@@ -1,8 +1,12 @@
 package em.test;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Random;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 
 import data.Dataset;
 import data.I2b2Dataset;
@@ -13,10 +17,17 @@ public class emWithTrueUnlabeled {
 
   public static void main(String[] args) throws IOException {
     
+    File file = new File(Constants.OUTFILE);
+    if(file.exists()) {
+      System.out.println(Constants.OUTFILE + " already exists... deleting...");
+      file.delete();
+    }
+    
     for(int numLabeled = Constants.STEP; numLabeled < Constants.MAXLABELED; numLabeled += Constants.STEP) {
       double labeledOnlyAccuracy = testEm(numLabeled, 0);
       double labeledAndUnlabeledAccuracy = testEm(numLabeled, Constants.ITERATIONS);
-      System.out.format("%d %.4f %.4f\n", numLabeled, labeledOnlyAccuracy, labeledAndUnlabeledAccuracy);
+      String out = String.format("%d %.4f %.4f\n", numLabeled, labeledOnlyAccuracy, labeledAndUnlabeledAccuracy);
+      Files.append(out, file, Charsets.UTF_8);
     }
   }
   
