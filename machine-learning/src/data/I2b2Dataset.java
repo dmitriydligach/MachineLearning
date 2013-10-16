@@ -2,6 +2,7 @@ package data;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -166,5 +167,21 @@ public class I2b2Dataset extends Dataset {
 	      instance.setLabel(to);
 	    }
 	  }
+	}
+	
+	/**
+	 * Remove all instances of a label.
+	 */
+	public void removeLabel(String label) {
+	  
+	  List<Instance> newInstances = new ArrayList<Instance>();
+	  
+	  for(Instance instance : instances) {
+	    if(! instance.getLabel().equals(label)) {
+	      newInstances.add(instance);
+	    }
+	  }
+	  
+	  instances = newInstances;
 	}
 }
