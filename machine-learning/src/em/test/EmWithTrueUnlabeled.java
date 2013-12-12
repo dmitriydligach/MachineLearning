@@ -13,7 +13,7 @@ import data.I2b2Dataset;
 import data.Split;
 import em.implementation.EmAlgorithm;
 
-public class emWithTrueUnlabeled {
+public class EmWithTrueUnlabeled {
 
   public static void main(String[] args) throws IOException {
     

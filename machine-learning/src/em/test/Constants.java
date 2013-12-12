@@ -8,7 +8,7 @@ public class Constants {
   public final static int STEP = 5;
   public final static int ITERATIONS = 25;
 	
-  public static final String DATAFILE = "/home/dima/active/ibd/data/data.txt";
-	public static final String LABELFILE = "/home/dima/active/ibd/data/labels-cd.txt";
+  public static final String DATAFILE = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt";
+	public static final String LABELFILE = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-cd.txt";
 	public static final String OUTFILE = "/home/dima/out/em.txt";
 }
