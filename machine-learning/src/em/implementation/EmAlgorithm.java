@@ -7,7 +7,8 @@ import data.Dataset;
 
 public class EmAlgorithm {
 
-  public static double runAndEvaluate(Dataset labeled, 
+  public static double runAndEvaluate(
+                          Dataset labeled, 
                           Dataset unlabeled, 
                           Dataset test, 
                           Alphabet labelAlphabet, 
