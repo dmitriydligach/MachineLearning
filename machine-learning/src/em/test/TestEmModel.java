@@ -14,6 +14,7 @@ public class TestEmModel {
 
 		I2b2Dataset dataset = new I2b2Dataset();
 		dataset.loadCSVFile(Constants.DATAFILE, Constants.LABELFILE);
+		dataset.normalize();
 		dataset.makeAlphabets(); // need label alphabet to init NB classifier
 		
 		Split[] splits = dataset.split(Constants.FOLDS);

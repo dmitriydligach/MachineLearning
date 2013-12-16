@@ -3,6 +3,8 @@ package em.test;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Random;
 
 import com.google.common.base.Charsets;
@@ -10,6 +12,7 @@ import com.google.common.io.Files;
 
 import data.Dataset;
 import data.I2b2Dataset;
+import data.Instance;
 import data.Split;
 import em.implementation.EmAlgorithm;
 
@@ -36,6 +39,8 @@ public class EmWithTrueUnlabeled {
     // load labeled data
     I2b2Dataset dataset = new I2b2Dataset();
     dataset.loadCSVFile(Constants.DATAFILE, Constants.LABELFILE);
+    dataset.mapLabels(new HashSet<String>(Arrays.asList("\"possible\"")), "\"no\"");
+    dataset.normalize();
     dataset.makeAlphabets();
     
     // load unlabeled data
