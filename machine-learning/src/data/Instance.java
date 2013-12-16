@@ -149,4 +149,30 @@ public class Instance {
 
 		return mass;
 	}
+	
+	/**
+	 * Calculate the length of this vector.
+	 */
+	public float getLength() {
+	  
+	  float sum = 0;
+	  for(float value : features.values()) {
+	    sum = sum + value * value;
+	  }
+	  
+	  return (float)Math.sqrt(sum);
+	}
+	
+	/**
+	 * Normalize this feature vector to be of unit length.
+	 * This method operates on the feature dictionary, 
+	 * so be sure to regenerate the vector if needed.
+	 */
+	public void normalize() {
+	  
+	  float length = getLength();
+	  for(String featureName : features.keySet()) {
+	    features.put(featureName, features.get(featureName) / length);
+	  }
+	}
 }

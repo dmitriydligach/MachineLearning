@@ -449,4 +449,14 @@ public class Dataset {
 	public Instance removeInstance(int index) {
 		return instances.remove(index);
 	}
+	
+	/**
+	 * Normalize feature values.
+	 */
+	public void normalize() {
+	  
+	  for(Instance instance: instances) {
+	    instance.normalize();
+	  }
+	}
 }
