@@ -12,7 +12,6 @@ import com.google.common.io.Files;
 
 import data.Dataset;
 import data.I2b2Dataset;
-import data.Instance;
 import data.Split;
 import em.implementation.EmAlgorithm;
 
