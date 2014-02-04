@@ -46,7 +46,7 @@ public class Evaluate {
       StringBuilder output = new StringBuilder();
       output.append(String.format("%-3d ", labeled));
       for(Configuration configuration : configurations) {
-        double accuracy = 0.123456789; // evaluate(configuration);
+        double accuracy = evaluate(configuration);
         output.append(String.format("%.4f ", accuracy));
       }
       output.append("\n");
