@@ -18,8 +18,8 @@ import em.implementation.EmAlgorithm;
 
 public class Evaluate {
 
-  public static final String data = Constants.cdData;
-  public static final String labels = Constants.cdLabel;
+  public static final String data = Constants.ucData;
+  public static final String labels = Constants.ucLabel;
   
   public static void main(String[] args) throws IOException {
     
