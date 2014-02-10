@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import utils.Misc;
+import cc.mallet.types.Dirichlet;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
@@ -22,6 +23,8 @@ import data.Instance;
  */
 public class Model {
 
+  public static final double[] dirichletParams = {1, 1};
+  
 	// number of classes
 	protected int numClasses;
 	// number of words (features)
@@ -87,7 +90,15 @@ public class Model {
 	      wordCounts[newLabel][word] += wordCount;
 	    }
 
-	    // compute thetas
+	    // sample thetas
+	    double[][] dirParams = new double[numClasses][numWords];
+	    for(int label = 0; label < numClasses; label++) {
+	      for(int word = 0; word < numWords; word++) {
+	        dirParams[label][word] = wordCounts[label][word] + dirichletParams[label];
+	      }
+	      Dirichlet dir = new Dirichlet(dirParams[label]);
+	      theta[label] = dir.nextDistribution();
+	    }
 	  }
 	  
 	}
