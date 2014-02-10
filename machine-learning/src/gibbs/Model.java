@@ -62,33 +62,29 @@ public class Model {
 	  for(Instance instance : unlabeled.getInstances()) {
 
 	    // subtract this instance's word counts and label counts
-	    labelCounts[labelAlphabet.getIndex(instance.getLabel())]--;
-	    for(int label = 0; label < numClasses; label++) {
-	      for(int word = 0; word < numWords; word++) {
-	        Float wordCount = instance.getDimensionValue(word);
-	        if(wordCount == null) {
-	          continue;
-	        }
-	        wordCounts[label][word] -= wordCount;
+	    int oldLabel = labelAlphabet.getIndex(instance.getLabel());
+	    labelCounts[oldLabel]--;
+	    for(int word = 0; word < numWords; word++) {
+	      Float wordCount = instance.getDimensionValue(word);
+	      if(wordCount == null) {
+	        continue;
 	      }
+	      wordCounts[oldLabel][word] -= wordCount;
 	    }
 	    
 	    double[] logSum = getUnnormalizedClassLogProbs(instance);
 	    double[] p = logToProb(logSum[0], logSum[1]);
-	    
-	    int labelIndex = Math.random() < p[0] ? 0 : 1;
-	    instance.setLabel(labelAlphabet.getString(labelIndex));
+	    int newLabel = Math.random() < p[0] ? 0 : 1;
+	    instance.setLabel(labelAlphabet.getString(newLabel));
 	   
 	    // add counts back
-	    labelCounts[labelIndex]++;
-	    for(int label = 0; label < numClasses; label++) {
-	      for(int word = 0; word < numWords; word++) {
-	        Float wordCount = instance.getDimensionValue(word);
-	        if(wordCount == null) {
-	          continue;
-	        }
-	        wordCounts[label][word] += wordCount;
+	    labelCounts[newLabel]++;
+	    for(int word = 0; word < numWords; word++) {
+	      Float wordCount = instance.getDimensionValue(word);
+	      if(wordCount == null) {
+	        continue;
 	      }
+	      wordCounts[newLabel][word] += wordCount;
 	    }
 
 	    // compute thetas
