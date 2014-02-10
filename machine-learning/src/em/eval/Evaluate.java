@@ -3,10 +3,8 @@ package em.eval;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -19,7 +17,7 @@ import em.implementation.EmAlgorithm;
 public class Evaluate {
 
   public static final String phenotype = "cd";
-  public static final boolean normalize = false;
+  public static final boolean normalize = true;
   
   public static void main(String[] args) throws IOException {
     
@@ -30,7 +28,10 @@ public class Evaluate {
     }
     
     for(int labeled = Constants.step; labeled < Constants.maxLabeled; labeled += Constants.step) {
+      
+      // generate experimental configurations for the given number of labeled examples
       List<Configuration> configurations = Configuration.generateConfigurations(phenotype, labeled, normalize);
+      
       StringBuilder output = new StringBuilder();
       output.append(String.format("%-3d ", labeled));
       for(Configuration configuration : configurations) {
@@ -38,6 +39,7 @@ public class Evaluate {
         output.append(String.format("%.4f ", accuracy));
       }
       output.append("\n");
+      
       Files.append(output, file, Charsets.UTF_8);
     }
   }
@@ -58,7 +60,7 @@ public class Evaluate {
       dataset.normalize();
       unlabeled.normalize();
     }
-    if(configuration.source.size() > 0) {
+    if(configuration.source != null) {
       dataset.mapLabels(configuration.source, configuration.target);
       unlabeled.mapLabels(configuration.source, configuration.target);
     }

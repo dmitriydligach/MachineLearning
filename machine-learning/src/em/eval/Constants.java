@@ -7,7 +7,7 @@ import java.util.Set;
 public class Constants {
   
   public final static int folds = 10;
-  public final static int maxLabeled = 600;
+  public final static int maxLabeled = 500;
   public final static int step = 5;
   public final static int iterations = 25;
   

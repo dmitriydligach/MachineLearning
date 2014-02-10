@@ -36,6 +36,9 @@ public class Configuration {
     this.target = target;
   }
 
+  /**
+   * Generate a list of configurations for a given size of the labeled set.
+   */
   public static List<Configuration> generateConfigurations(
       String phenotype, 
       int labeled,
