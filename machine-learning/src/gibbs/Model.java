@@ -16,10 +16,9 @@ import data.Dataset;
 import data.Instance;
 
 /**
- * Implements a multinomial naive bayes classifier.
+ * Implements a naive bayes model for a gibbs sampler.
  * 
  * @author dmitriy dligach
- *
  */
 public class Model {
 
@@ -44,6 +43,60 @@ public class Model {
 
 	// map labels to ints and ints to labels
 	Alphabet labelAlphabet;
+
+	
+	// ***** new stuff begins here *****
+	
+	// may not need a class member
+	public Dataset labeled;
+	public Dataset unlabeled;
+	
+	// constructor
+	public Model(Dataset labeled, Dataset unlabeled) {
+	  this.labeled = labeled;
+	  this.unlabeled = unlabeled;
+	}
+	
+	public void sample() {
+	  
+	  for(Instance instance : unlabeled.getInstances()) {
+
+	    // subtract this instance's word counts and label counts
+	    labelCounts[labelAlphabet.getIndex(instance.getLabel())]--;
+	    for(int label = 0; label < numClasses; label++) {
+	      for(int word = 0; word < numWords; word++) {
+	        Float wordCount = instance.getDimensionValue(word);
+	        if(wordCount == null) {
+	          continue;
+	        }
+	        wordCounts[label][word] -= wordCount;
+	      }
+	    }
+	    
+	    double[] logSum = getUnnormalizedClassLogProbs(instance);
+	    double[] p = logToProb(logSum[0], logSum[1]);
+	    
+	    int labelIndex = Math.random() < p[0] ? 0 : 1;
+	    instance.setLabel(labelAlphabet.getString(labelIndex));
+	   
+	    // add counts back
+	    labelCounts[labelIndex]++;
+	    for(int label = 0; label < numClasses; label++) {
+	      for(int word = 0; word < numWords; word++) {
+	        Float wordCount = instance.getDimensionValue(word);
+	        if(wordCount == null) {
+	          continue;
+	        }
+	        wordCounts[label][word] += wordCount;
+	      }
+	    }
+
+	    // compute thetas
+	  }
+	  
+	}
+	
+	// ***** new stuf ends here *****
 	
 	/** 
 	 * Set the label alphabet here. This cannot be done in initialize()
