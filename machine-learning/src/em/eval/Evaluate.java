@@ -18,19 +18,19 @@ import em.implementation.EmAlgorithm;
 
 public class Evaluate {
 
-  public static final String data = Constants.ucData;
-  public static final String labels = Constants.ucLabel;
+  public static final String phenotype = "cd";
+  public static final boolean normalize = false;
   
   public static void main(String[] args) throws IOException {
     
-    File file = new File(Constants.outputFile);
+    File file = new File(Constants.outputDir + phenotype + (normalize ? "-normalized" : "") + ".txt");
     if(file.exists()) {
-      System.out.println(Constants.outputFile + " already exists... deleting...");
+      System.out.println(file.getName() + " already exists... deleting...");
       file.delete();
     }
     
     for(int labeled = Constants.step; labeled < Constants.maxLabeled; labeled += Constants.step) {
-      List<Configuration> configurations = makeConfigurations(labeled, false);
+      List<Configuration> configurations = Configuration.generateConfigurations(phenotype, labeled, normalize);
       StringBuilder output = new StringBuilder();
       output.append(String.format("%-3d ", labeled));
       for(Configuration configuration : configurations) {
@@ -41,41 +41,26 @@ public class Evaluate {
       Files.append(output, file, Charsets.UTF_8);
     }
   }
-
-  /**
-   * Create a list of configurations for a phenotype.
-   */
-  public static List<Configuration> makeConfigurations(int labeled, boolean normalize) {
-    
-    List<Configuration> configurations = new ArrayList<Configuration>();
-    
-    configurations.add(new Configuration(labeled, 0, 0, normalize));
-    configurations.add(new Configuration(labeled, 500, 25, normalize));
-    configurations.add(new Configuration(labeled, 1000, 25, normalize));
-    configurations.add(new Configuration(labeled, 3000, 25, normalize));
-    configurations.add(new Configuration(labeled, 5000, 25, normalize));
-    
-    return configurations;
-  }
   
   /**
    * Evaluate a configuration. Return n-fold CV accuracy.
    */
   public static double evaluate(Configuration configuration) throws FileNotFoundException {
 
-    // load labeled data
+    // load labeled and unlabeled data
     I2b2Dataset dataset = new I2b2Dataset();
-    dataset.loadCSVFile(data, labels);
+    dataset.loadCSVFile(configuration.data, configuration.labels);
     dataset.makeAlphabets();
-    if(configuration.normalize) {
-      dataset.normalize();
-    }
-    
-    // load unlabeled data
     I2b2Dataset unlabeled = new I2b2Dataset();
-    unlabeled.loadFromCSVFile(data, labels, configuration.unlabeled);
+    unlabeled.loadFromCSVFile(configuration.data, configuration.labels, configuration.unlabeled);
+    
     if(configuration.normalize) {
       dataset.normalize();
+      unlabeled.normalize();
+    }
+    if(configuration.source.size() > 0) {
+      dataset.mapLabels(configuration.source, configuration.target);
+      unlabeled.mapLabels(configuration.source, configuration.target);
     }
     
     Split[] splits = dataset.split(Constants.folds);
@@ -98,34 +83,5 @@ public class Evaluate {
     }
 
     return cumulativeAccuracy / Constants.folds;
-  }
-  
-  public static class Configuration {
-    
-    public int labeled;
-    public int unlabeled;
-    public int iterations;
-    public boolean normalize;
-    
-    // remap all labels in source to target
-    public Set<String> sourceLabels;
-    public String targetLabel;
-    
-    public Configuration(int labeled, int unlabeled, int iterations, boolean normalize) {
-      this.labeled = labeled;
-      this.unlabeled = unlabeled;
-      this.iterations = iterations;
-      this.normalize = normalize;
-    }
-    
-    Configuration(int labeled, int unlabeled, int iterations, boolean normalize,
-                  Set<String> sourceLabels, String targetLabel) {
-      this.labeled = labeled;
-      this.unlabeled = unlabeled;
-      this.iterations = iterations;
-      this.normalize = normalize;
-      this.sourceLabels = sourceLabels;
-      this.targetLabel = targetLabel;
-    }
   }
 }

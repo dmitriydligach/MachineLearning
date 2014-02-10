@@ -9,22 +9,29 @@ public class Constants {
   public final static int folds = 10;
   public final static int maxLabeled = 600;
   public final static int step = 5;
+  public final static int iterations = 25;
+  
+  public final static int[] unlabeledSizes = {500, 1000, 3000, 5000};
 	
   public static final String cdData = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt";
-	public static final String cdLabel = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-cd.txt";
+	public static final String cdLabels = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-cd.txt";
+	public static final Set<String> cdSourceLabels = null;
+	public static final String cdTargetLabel = null;
 	
 	public static final String ucData = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt";
-  public static final String ucLabel = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-uc.txt";
+  public static final String ucLabels = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-uc.txt";
+  public static final Set<String> ucSourceLabels = null;
+  public static final String ucTargetLabel = null;
   
   public static final String msData = "/Users/Dima/Boston/Data/Phenotype/MS/Data/data.txt";
-  public static final String msLabel = "/Users/Dima/Boston/Data/Phenotype/MS/Data/labels.txt";
+  public static final String msLabels = "/Users/Dima/Boston/Data/Phenotype/MS/Data/labels.txt";
   public static final Set<String> msSourceLabels = new HashSet<String>(Arrays.asList("2", "3", "4", "5"));
   public static final String msTargetLabel = "2";
   
   public static final String t2dData = "/Users/Dima/Boston/Data/Phenotype/T2D/Data/data.txt";
-  public static final String t2dLabel = "/Users/Dima/Boston/Data/Phenotype/T2D/Data/labels.txt";
+  public static final String t2dLabels = "/Users/Dima/Boston/Data/Phenotype/T2D/Data/labels.txt";
   public static final Set<String> t2dSourceLabels = new HashSet<String>(Arrays.asList("\"possible\""));
   public static final String t2dTargetLabel = "\"no\"";
   
-	public static final String outputFile = "/Users/Dima/Boston/Output/em.txt";
+	public static final String outputDir = "/Users/Dima/Boston/Output/";
 }
