@@ -15,13 +15,9 @@ public class Constants {
 	
   public static final String cdData = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt";
 	public static final String cdLabels = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-cd.txt";
-	public static final Set<String> cdSourceLabels = null;
-	public static final String cdTargetLabel = null;
 	
 	public static final String ucData = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt";
   public static final String ucLabels = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-uc.txt";
-  public static final Set<String> ucSourceLabels = null;
-  public static final String ucTargetLabel = null;
   
   public static final String msData = "/Users/Dima/Boston/Data/Phenotype/MS/Data/data.txt";
   public static final String msLabels = "/Users/Dima/Boston/Data/Phenotype/MS/Data/labels.txt";

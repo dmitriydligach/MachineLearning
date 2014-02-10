@@ -42,7 +42,7 @@ public class Configuration {
   public static List<Configuration> generateConfigurations(
       String phenotype, 
       int labeled,
-      boolean normalize) {
+      boolean normalize) throws IllegalArgumentException {
 
     List<Configuration> configurations = new ArrayList<Configuration>();
     String data;
@@ -53,13 +53,13 @@ public class Configuration {
     if(phenotype.equals("cd")) {
       data = Constants.cdData;
       labels = Constants.cdLabels;
-      source = Constants.cdSourceLabels;
-      target = Constants.cdTargetLabel;
+      source = null;
+      target = null;
     } else if(phenotype.equals("uc")) {
       data = Constants.ucData;
       labels = Constants.ucLabels;
-      source = Constants.ucSourceLabels;
-      target = Constants.ucTargetLabel;
+      source = null;
+      target = null;
     } else if(phenotype.equals("ms")) {
       data = Constants.msData;
       labels = Constants.msLabels;
@@ -74,7 +74,7 @@ public class Configuration {
       throw new IllegalArgumentException("Bad phenotype!");
     }
 
-    // make a baseline configuration (no em)
+    // make a baseline configuration (labeled data only)
     Configuration configuration0 = new Configuration(
         data,
         labels,

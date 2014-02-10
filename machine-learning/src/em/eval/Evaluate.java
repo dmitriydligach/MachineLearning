@@ -34,12 +34,13 @@ public class Evaluate {
       
       StringBuilder output = new StringBuilder();
       output.append(String.format("%-3d ", labeled));
+      
       for(Configuration configuration : configurations) {
         double accuracy = evaluate(configuration);
         output.append(String.format("%.4f ", accuracy));
       }
-      output.append("\n");
       
+      output.append("\n");      
       Files.append(output, file, Charsets.UTF_8);
     }
   }
@@ -49,10 +50,12 @@ public class Evaluate {
    */
   public static double evaluate(Configuration configuration) throws FileNotFoundException {
 
-    // load labeled and unlabeled data
+    // load labeled data
     I2b2Dataset dataset = new I2b2Dataset();
     dataset.loadCSVFile(configuration.data, configuration.labels);
     dataset.makeAlphabets();
+    
+    // load unlabeled data
     I2b2Dataset unlabeled = new I2b2Dataset();
     unlabeled.loadFromCSVFile(configuration.data, configuration.labels, configuration.unlabeled);
     
