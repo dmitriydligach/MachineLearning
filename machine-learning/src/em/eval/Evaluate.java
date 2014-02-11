@@ -29,8 +29,8 @@ public class Evaluate {
     
     for(int labeled = Constants.step; labeled < Constants.maxLabeled; labeled += Constants.step) {
       
-      // generate experimental configurations for the given number of labeled examples
-      List<Configuration> configurations = Configuration.generateConfigurations(phenotype, labeled, normalize);
+      // for a fixed number of labeled examples, create configurations with varying number of unlabeled examples 
+      List<Configuration> configurations = Configuration.createConfigurations(phenotype, labeled);
       
       StringBuilder output = new StringBuilder();
       output.append(String.format("%-3d ", labeled));
@@ -52,20 +52,20 @@ public class Evaluate {
 
     // load labeled data
     I2b2Dataset dataset = new I2b2Dataset();
-    dataset.loadCSVFile(configuration.data, configuration.labels);
+    dataset.loadCSVFile(configuration.dataPath, configuration.labelPath);
     dataset.makeAlphabets();
     
     // load unlabeled data
     I2b2Dataset unlabeled = new I2b2Dataset();
-    unlabeled.loadFromCSVFile(configuration.data, configuration.labels, configuration.unlabeled);
+    unlabeled.loadFromCSVFile(configuration.dataPath, configuration.labelPath, configuration.numUnlabeled);
     
-    if(configuration.normalize) {
+    if(normalize) {
       dataset.normalize();
       unlabeled.normalize();
     }
-    if(configuration.source != null) {
-      dataset.mapLabels(configuration.source, configuration.target);
-      unlabeled.mapLabels(configuration.source, configuration.target);
+    if(configuration.sourceLabels != null) {
+      dataset.mapLabels(configuration.sourceLabels, configuration.targetLabel);
+      unlabeled.mapLabels(configuration.sourceLabels, configuration.targetLabel);
     }
     
     Split[] splits = dataset.split(Constants.folds);
@@ -76,14 +76,14 @@ public class Evaluate {
       Dataset nontest = splits[fold].getPoolSet();
       Dataset test = splits[fold].getTestSet();
 
-      labeled.add(nontest.popRandom(configuration.labeled, new Random(100)));
+      labeled.add(nontest.popRandom(configuration.numLabeled, new Random(100)));
       double accuracy = EmAlgorithm.runAndEvaluate(
           labeled, 
           unlabeled,
           test, 
           dataset.getLabelAlphabet(), 
           dataset.getFeatureAlphabet(),
-          configuration.iterations);
+          configuration.numIterations);
       cumulativeAccuracy = cumulativeAccuracy + accuracy;
     }
 

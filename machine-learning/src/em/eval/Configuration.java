@@ -4,18 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * A single configuration represents an semi-supervised learning experiment
+ * in which there is a fixed number of labeled examples and a fixed number of
+ * unlabeled examples.
+ * 
+ * @author dmitriy dligach
+  */
 public class Configuration {
   
-  public String data;
-  public String labels;
+  public String dataPath;
+  public String labelPath;
   
-  public int labeled;
-  public int unlabeled;
-  public int iterations;
-  public boolean normalize;
+  public int numLabeled;
+  public int numUnlabeled;
+  public int numIterations;
   
-  public Set<String> source; // labels to be remapped
-  public String target; // label with which to remap
+  public Set<String> sourceLabels; // labels to be remapped
+  public String targetLabel; // label with which to remap
   
   public Configuration(
       String data,
@@ -23,80 +29,74 @@ public class Configuration {
       int labeled,
       int unlabeled, 
       int iterations, 
-      boolean normalize,
       Set<String> source,
       String target) {
-    this.data = data;
-    this.labels = labels;
-    this.labeled = labeled;
-    this.unlabeled = unlabeled;
-    this.iterations = iterations;
-    this.normalize = normalize;
-    this.source = source;
-    this.target = target;
+    this.dataPath = data;
+    this.labelPath = labels;
+    this.numLabeled = labeled;
+    this.numUnlabeled = unlabeled;
+    this.numIterations = iterations;
+    this.sourceLabels = source;
+    this.targetLabel = target;
   }
 
   /**
    * Generate a list of configurations for a given size of the labeled set.
+   * TODO: This method should probably find a different home.
    */
-  public static List<Configuration> generateConfigurations(
-      String phenotype, 
-      int labeled,
-      boolean normalize) throws IllegalArgumentException {
+  public static List<Configuration> createConfigurations(String phenotype, int numLabeledExamples) {
 
     List<Configuration> configurations = new ArrayList<Configuration>();
-    String data;
-    String labels;
-    Set<String> source;
-    String target;
+    String dataFile;
+    String labelFile;
+    Set<String> sourceLabelSet;
+    String targetLabel;
 
     if(phenotype.equals("cd")) {
-      data = Constants.cdData;
-      labels = Constants.cdLabels;
-      source = null;
-      target = null;
+      dataFile = Constants.cdData;
+      labelFile = Constants.cdLabels;
+      sourceLabelSet = null;
+      targetLabel = null;
     } else if(phenotype.equals("uc")) {
-      data = Constants.ucData;
-      labels = Constants.ucLabels;
-      source = null;
-      target = null;
+      dataFile = Constants.ucData;
+      labelFile = Constants.ucLabels;
+      sourceLabelSet = null;
+      targetLabel = null;
     } else if(phenotype.equals("ms")) {
-      data = Constants.msData;
-      labels = Constants.msLabels;
-      source = Constants.msSourceLabels;
-      target = Constants.msTargetLabel;
+      dataFile = Constants.msData;
+      labelFile = Constants.msLabels;
+      sourceLabelSet = Constants.msSourceLabels;
+      targetLabel = Constants.msTargetLabel;
     } else if(phenotype.equals("t2d")) {
-      data = Constants.ucData;
-      labels = Constants.t2dLabels;
-      source = Constants.t2dSourceLabels;
-      target = Constants.t2dTargetLabel;
+      dataFile = Constants.ucData;
+      labelFile = Constants.t2dLabels;
+      sourceLabelSet = Constants.t2dSourceLabels;
+      targetLabel = Constants.t2dTargetLabel;
     } else {
       throw new IllegalArgumentException("Bad phenotype!");
     }
 
     // make a baseline configuration (labeled data only)
     Configuration configuration0 = new Configuration(
-        data,
-        labels,
-        labeled,
+        dataFile,
+        labelFile,
+        numLabeledExamples,
         0,
         0,
-        normalize,
-        source,
-        target);
+        sourceLabelSet,
+        targetLabel);
     configurations.add(configuration0);
     
     // make the rest of configurations
-    for(int unlabeled : Constants.unlabeledSizes) {
+    for(int numUnlabeledExamples : Constants.unlabeledSizes) {
       Configuration configuration = new Configuration(
-          data,
-          labels,
-          labeled,
-          unlabeled,
+          dataFile,
+          labelFile,
+          numLabeledExamples,
+          numUnlabeledExamples,
           Constants.iterations,
-          normalize,
-          source,
-          target);
+          sourceLabelSet,
+          targetLabel);
       configurations.add(configuration);
     }
     
