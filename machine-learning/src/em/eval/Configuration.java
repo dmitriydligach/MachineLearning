@@ -24,20 +24,20 @@ public class Configuration {
   public String targetLabel; // label with which to remap
   
   public Configuration(
-      String data,
-      String labels,
-      int labeled,
-      int unlabeled, 
-      int iterations, 
-      Set<String> source,
-      String target) {
-    this.dataPath = data;
-    this.labelPath = labels;
-    this.numLabeled = labeled;
-    this.numUnlabeled = unlabeled;
-    this.numIterations = iterations;
-    this.sourceLabels = source;
-    this.targetLabel = target;
+      String pathToData,
+      String pathToLabels,
+      int numLabeledExamples,
+      int numUnlabeledExamples, 
+      int emIterations, 
+      Set<String> sourceLabelSet,
+      String targetLabel) {
+    this.dataPath = pathToData;
+    this.labelPath = pathToLabels;
+    this.numLabeled = numLabeledExamples;
+    this.numUnlabeled = numUnlabeledExamples;
+    this.numIterations = emIterations;
+    this.sourceLabels = sourceLabelSet;
+    this.targetLabel = targetLabel;
   }
 
   /**
