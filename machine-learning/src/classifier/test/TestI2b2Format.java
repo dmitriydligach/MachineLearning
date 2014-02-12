@@ -15,7 +15,8 @@ public class TestI2b2Format {
 
 		I2b2Dataset dataset = new I2b2Dataset();
 
-		dataset.loadCSVFile("/home/dima/active/t2d/data/data.txt", "/home/dima/active/t2d/data/labels.txt");
+		dataset.loadCSVFile("/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt", 
+		                    "/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-cd.txt");
 		System.out.println("total instances loaded: " + dataset.size());
 		dataset.makeAlphabets();
 		Split[] splits = dataset.split(N);
@@ -34,7 +35,7 @@ public class TestI2b2Format {
 			NaiveBayesClassifier classifier = new NaiveBayesClassifier(dataset.getLabelAlphabet());
 			classifier.train(trainSet);
 
-			double accuracy = classifier.test(testSet, "\"yes\"");
+			double accuracy = classifier.test(testSet);
 
 			cumulativeAccuracy = cumulativeAccuracy + accuracy;
 		}
