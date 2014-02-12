@@ -1,7 +1,6 @@
 package gibbs;
 
 import java.util.HashSet;
-import java.util.Map;
 
 import cc.mallet.types.Dirichlet;
 import data.Alphabet;
@@ -15,6 +14,8 @@ import em.implementation.EmModel;
  * @author dmitriy dligach
  */
 public class Model {
+  
+  public static final int numSamples = 100;
   
   // hyperparameters of beta distribution
   public static final double[] betaParams = {1, 1};
@@ -68,6 +69,15 @@ public class Model {
 
 	  priors = new double[numClasses];
 	  theta = new double[numClasses][numWords];
+	}
+	
+	public void run() {
+	  
+	  initialize();
+	  
+	  for(int sample = 0; sample < numSamples; sample++) {
+	    sample();
+	  }
 	}
 	
 	public void initialize() {
