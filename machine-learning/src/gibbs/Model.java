@@ -1,20 +1,13 @@
 package gibbs;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Map;
 
-import utils.Misc;
 import cc.mallet.types.Dirichlet;
-
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
-import com.google.common.collect.Ordering;
-
 import data.Alphabet;
 import data.Dataset;
 import data.Instance;
+import em.implementation.EmModel;
 
 /**
  * Implements a naive bayes model for a gibbs sampler.
@@ -22,8 +15,13 @@ import data.Instance;
  * @author dmitriy dligach
  */
 public class Model {
-
+  
+  // hyperparameters of beta distribution
+  public static final double[] betaParams = {1, 1};
+  
+  // hyperparameters of dirichlet distribution
   public static final double[] dirichletParams = {1, 1};
+
   
 	// number of classes
 	protected int numClasses;
@@ -47,17 +45,54 @@ public class Model {
 	// map labels to ints and ints to labels
 	Alphabet labelAlphabet;
 
-	
-	// ***** new stuff begins here *****
-	
 	// may not need a class member
 	public Dataset labeled;
 	public Dataset unlabeled;
+	public Dataset test;
+	public Dataset all;
 	
 	// constructor
-	public Model(Dataset labeled, Dataset unlabeled) {
-	  this.labeled = labeled;
-	  this.unlabeled = unlabeled;
+	public Model(Dataset labeled, Dataset unlabeled, Dataset test) {
+	  
+	  all = new Dataset(labeled.getInstances(), unlabeled.getInstances(), test.getInstances());
+	  all.makeAlphabets();
+	  labelAlphabet = all.getLabelAlphabet();
+
+	  numClasses = labelAlphabet.size();
+	  numWords = all.getFeatureAlphabet().size(); // alphabet from labeled maybe?
+	  numInstances = all.size();
+	  
+	  labelCounts = new int[numClasses];
+	  wordCounts = new double[numClasses][numWords];
+	  totalClassWords = new int[numClasses];
+
+	  priors = new double[numClasses];
+	  theta = new double[numClasses][numWords];
+	}
+	
+	public void initialize() {
+	  
+	  // label unlabeled examples
+	  
+	  labeled.makeAlphabets();
+	  labeled.makeVectors();
+	  unlabeled.setAlphabets(labeled.getLabelAlphabet(), labeled.getFeatureAlphabet());
+	  test.setAlphabets(labeled.getLabelAlphabet(), labeled.getFeatureAlphabet());
+	  unlabeled.makeVectors();
+	  test.makeAlphabets();
+	  
+	  labeled.setInstanceClassProbabilityDistribution(new HashSet<String>(labelAlphabet.getStrings()));
+	  EmModel classifier = new EmModel(labelAlphabet);
+	  classifier.train(labeled);
+	  classifier.label(unlabeled);
+	  classifier.label(test);
+	  
+	  // compute counts
+	  computeLabelCounts(all);
+	  computeWordCounts(all);
+	  computeTotalClassWords(all);
+	  
+	  computeTheta();
 	}
 	
 	public void sample() {
@@ -75,7 +110,7 @@ public class Model {
 	      wordCounts[oldLabel][word] -= wordCount;
 	    }
 	    
-	    double[] logSum = getUnnormalizedClassLogProbs(instance);
+	    double[] logSum = getUnnormalizedLogProbForClasses(instance);
 	    double[] p = logToProb(logSum[0], logSum[1]);
 	    int newLabel = Math.random() < p[0] ? 0 : 1;
 	    instance.setLabel(labelAlphabet.getString(newLabel));
@@ -103,42 +138,10 @@ public class Model {
 	  
 	}
 	
-	// ***** new stuf ends here *****
-	
-	/** 
-	 * Set the label alphabet here. This cannot be done in initialize()
-	 * using the dataset's alphabet because sometimes the training data
-	 * may not have all the labels that exist in the test data.
-	 */
-	public Model(Alphabet labelAlphabet) 
-	{
-		this.labelAlphabet = labelAlphabet;
-	}
-	
-	/**
-	 * Initialize various counts needed for training.
-	 * Assumes alphabet and vectors generated for this set.
-	 */
-	protected void initialize(Dataset dataset) {
-		
-		numClasses = labelAlphabet.size();
-		numWords = dataset.getNumberOfDimensions();
-		numInstances = dataset.size();
-		
-		wordCounts = new double[numClasses][numWords];
-		labelCounts = new int[numClasses];
-		totalClassWords = new int[numClasses];
-		
-		priors = new double[numClasses];
-		theta = new double[numClasses][numWords];
-	}
-
 	/**
 	 * Train a multinomial naive bayes model using a dataset.
 	 */
 	public void train(Dataset dataset) {
-
-		initialize(dataset);
 		
 		// compute various useful counts
 		computeWordCounts(dataset);
@@ -149,100 +152,7 @@ public class Model {
 		computeTheta();
 		computePriors();
 	}
-		
-	/**
-	 * Classify instances in a dataset. Return accuracy.
-	 */
-	public double test(Dataset dataset) {
-		
-		int correct = 0;
-		int total = 0;
-		
-		for(Instance instance : dataset.getInstances()) {
-			int prediction = classify(instance);
-			if(prediction == labelAlphabet.getIndex(instance.getLabel())) {
-				correct++;
-			}
-			total++;
-		}
 
-		return (double) correct / total;
-	}
-
-	/**
-	 * Classify instances in a dataset. Return F1 for the given label.
-	 */
-	public double test(Dataset dataset, String label) {
-		
-		int correctLabelPredictions = 0; // number of times the label was predicted correctly
-		int totalLabelPredictions = 0;   // number of times the classifier predicted the label
-		int totalLabelInstances = 0;     // number of instances of the label in the dataset
-		
-		for(Instance instance : dataset.getInstances()) {
-			int prediction = classify(instance);
-			
-			if(prediction == labelAlphabet.getIndex(label)) {
-				totalLabelPredictions++;
-				if(prediction == labelAlphabet.getIndex(instance.getLabel())) {
-					correctLabelPredictions++;
-				}
-			}
-			
-			if(label.equals(instance.getLabel())) {
-				totalLabelInstances++;
-			}
-		}
-		
-		double precision = (double) correctLabelPredictions / totalLabelPredictions;
-		double recall = (double) correctLabelPredictions / totalLabelInstances;
-			
-		return (2 * precision * recall) / (precision + recall);
-	}
-		
-	
-	/**
-	 * Classify a document using a multinomial naive bayes model. 
-	 */
-	public int classify(Instance instance) {
-		double[] classLogProbs = getUnnormalizedClassLogProbs(instance);
-		return Misc.getIndexOfLargestElement(classLogProbs);
-	}
-
-	/**
-	 * Find the most problematic instance for the current model. 
-	 * Remove this instance from the dataset and return it.
-	 */
-	public Instance getMostUncertainInstance(Dataset dataset) {
-
-		// key: instance index, value: uncertainty margin
-		HashMap<Integer, Double> scoredInstances = new HashMap<Integer, Double>();
-
-		for(int instanceIndex = 0; instanceIndex < dataset.size(); instanceIndex++) {
-			Double instanceScore = computeUncertainty(dataset.getInstance(instanceIndex));
-			scoredInstances.put(instanceIndex, instanceScore);
-		}
-		
-		// sort by margin size; small margin first (e.g. p(c1) = 0.49, p(c2) = 0.51)
-		List<Integer> sortedKeys = new ArrayList<Integer>(scoredInstances.keySet());
-    Function<Integer, Double> getValue = Functions.forMap(scoredInstances);
-    Collections.sort(sortedKeys, Ordering.natural().onResultOf(getValue));
-
-    // remove and return the instance with smallest margin
-    return dataset.removeInstance(sortedKeys.get(0));
-	}
-	
-	/**
-	 * Compute uncertainty margin for an instance, which is
-	 * |p(most probable class) - p(second most probable class)|
-	 */
-	public Double computeUncertainty(Instance instance) {
-		// TODO: generalize to n classes
-		
-		double[] logSum = getUnnormalizedClassLogProbs(instance);
-		double[] p = logToProb(logSum[0], logSum[1]);
-		return Math.abs(p[0] - p[1]);
-	}
-	
 	/**
 	 * Convert two unnormalized log probs to probabilities.
 	 */
@@ -259,45 +169,27 @@ public class Model {
 		return p;
 	}
 	
-	/**
-	 * Calculate for each class:
-	 * 
-	 * p(c|w_0, ..., w_n-1) ~ p(c)p(w_0|c)p(w_1|c)...p(w_n-1|c)
-	 *   where w_0, ..., w_n-1 are word tokens in the document
-	 *   
-	 * Calculations are done in log space. I.e. we need to calculate:
-	 * log(p(c)p(w_0|c)...p(w_n-1|c)) = log(p(c)) + log(p(w_0|c)) + ... + log(p(w_n-1|c))
-	 * 
-	 * OOV words (i.e. words not seen during training) are currently ignored.
-	 * 
-	 * TODO: For the inner loop, iterate over words that exist in this vector.
-	 * For some of them (OOV words), p(w|c) will be unknown (ignore them).
-	 */
-	public double[] getUnnormalizedClassLogProbs(Instance instance) {
-		
-		double[] logSum = new double[numClasses];
+  private double[] getUnnormalizedLogProbForClasses(Instance instance){
+    // equation 49 from "Gibbs Sampling for the Uninitiated" by Resnik and Hardisty (June 2010 version)
+    
+    double[] logSum = new double[numClasses];
+    
+    for(int label = 0; label < numClasses; label++) {
+      
+      double outer = (labelCounts[label] + betaParams[label] - 1) / 
+          (double)(numInstances + betaParams[0] + betaParams[1] - 1);
 
-		for(int label = 0; label < numClasses; label++) {
-			logSum[label] = Math.log10(priors[label]);
-
-			// iterate over words that were seen during training
-			for(int word = 0; word < numWords; word++) {
-				Float wordCount = instance.getDimensionValue(word);
-				if(wordCount == null) {
-					// this instance does not contain the current word; just go on to
-					// the next word (i.e. pretend the wordCount for this word is zero)
-					continue;
-				}
-				
-				double wordProb = theta[label][word];        
-				double prob = Math.pow(wordProb, wordCount); 
-				logSum[label] += Math.log10(prob);
-			}
-		}
-		
-		return logSum;
-	}
-
+      logSum[label] = Math.log10(outer);
+      
+      for(int word = 0; word < numWords; word++) {
+        double inner = wordCounts[label][word] * Math.log10(theta[label][word]);
+        logSum[label] += inner;
+      }
+    }
+    
+    return logSum;
+  }
+  
 	/**
 	 * Compute p(w|c) parameters.
 	 * 
@@ -369,64 +261,6 @@ public class Model {
 		for(Instance instance : dataset.getInstances()) {
 			int label = labelAlphabet.getIndex(instance.getLabel());
 			totalClassWords[label] += instance.getTotalMass();
-		}
-	}
-	
-	/**
-	 * Display the thetas for each class (sorted).
-	 */
-	public void printModel(Alphabet featureAlphabet) {
-		
-		List<HashMap<String, Double>> allClassThetas = new ArrayList<HashMap<String, Double>>();
-		
-		for(int label = 0; label < numClasses; label++) {
-			HashMap<String, Double> classThetas = new HashMap<String, Double>();
-			
-			for(int word = 0; word < numWords; word++) {
-				String string = featureAlphabet.getString(word);
-				classThetas.put(string, theta[label][word]);
-			}
-			
-	    List<String> sortedKeys = new ArrayList<String>(classThetas.keySet());
-	    Function<String, Double> getValue = Functions.forMap(classThetas);
-	    Collections.sort(sortedKeys, Ordering.natural().reverse().onResultOf(getValue));
-
-	    System.out.format("p(%s) = %f\n\n", labelAlphabet.getString(label), priors[label]);
-	    
-	    for(int i = 0; i < 5; i++) {
-	    	String key = sortedKeys.get(i);
-	    	System.out.format("p(%s|%s) = %f\n", key, labelAlphabet.getString(label), classThetas.get(key));
-			}
-	    System.out.println();
-	    
-	    allClassThetas.add(classThetas);
-		}
-	}
-	
-	/**
-	 * Do feature contribution analysis. Use p(w|c1) / p(w|c2) for ranking features.
-	 * Features that get the scores close to 1, do not contribute much.
-	 */
-	public void featureLogOdds(List<HashMap<String, Double>> allClassThetas) {
-		
-		HashMap<String, Double> ratios = new HashMap<String, Double>();
-		
-		for(String feature : allClassThetas.get(0).keySet()) {
-			double ratio = 0.0;
-			if(allClassThetas.get(0).get(feature) > allClassThetas.get(1).get(feature)) {
-				ratio = allClassThetas.get(0).get(feature) / allClassThetas.get(1).get(feature);
-			} else {
-				ratio = allClassThetas.get(1).get(feature) / allClassThetas.get(0).get(feature);
-			}
-			ratios.put(feature, Math.abs(ratio)); 
-		}
-		
-    List<String> sortedKeys = new ArrayList<String>(ratios.keySet());
-    Function<String, Double> getValue = Functions.forMap(ratios);
-    Collections.sort(sortedKeys, Ordering.natural().reverse().onResultOf(getValue));
-
-    for(String key : sortedKeys) {
-    	System.out.format("score(%s) = %f\n", key, ratios.get(key));
 		}
 	}
 }
