@@ -74,6 +74,27 @@ public class Dataset {
       instances.add(new Instance(sourceInstance));
     }
 	}
+
+  /** 
+   * Create a dataset from three lists of instances
+   */
+  public Dataset(List<Instance> sourceInstances1, List<Instance> sourceInstances2, List<Instance> sourceInstances3) {
+    
+    instances = new ArrayList<Instance>();
+    featureAlphabet = new Alphabet();
+    labelAlphabet = new Alphabet();
+    dfs = HashMultiset.create();
+
+    for(Instance sourceInstance : sourceInstances1) {
+      instances.add(new Instance(sourceInstance));
+    }
+    for(Instance sourceInstance : sourceInstances2) {
+      instances.add(new Instance(sourceInstance));
+    }
+    for(Instance sourceInstance : sourceInstances3) {
+      instances.add(new Instance(sourceInstance));
+    }
+  }
 	
 	/**
 	 * Load instances from comma-separated file. 
