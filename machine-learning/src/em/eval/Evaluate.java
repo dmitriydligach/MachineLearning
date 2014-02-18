@@ -70,8 +70,6 @@ public class Evaluate {
     // make alphabets now, after labels were potentially remapped 
     dataset.makeAlphabets();
     
-    System.out.println("unlabeled size: " + unlabeled.size());
-    
     Split[] splits = dataset.split(Constants.folds);
     double cumulativeAccuracy = 0;
 
