@@ -16,8 +16,8 @@ import em.implementation.EmAlgorithm;
 
 public class Evaluate {
 
-  public static final String phenotype = "cd";
-  public static final boolean normalize = true;
+  public static final String phenotype = "ms";
+  public static final boolean normalize = false;
   
   public static void main(String[] args) throws IOException {
     
@@ -53,7 +53,6 @@ public class Evaluate {
     // load labeled data
     I2b2Dataset dataset = new I2b2Dataset();
     dataset.loadCSVFile(configuration.dataPath, configuration.labelPath);
-    dataset.makeAlphabets();
     
     // load unlabeled data
     I2b2Dataset unlabeled = new I2b2Dataset();
@@ -64,9 +63,14 @@ public class Evaluate {
       unlabeled.normalize();
     }
     if(configuration.sourceLabels != null) {
+      // no need to remap unlabeled since there are no labels
       dataset.mapLabels(configuration.sourceLabels, configuration.targetLabel);
-      unlabeled.mapLabels(configuration.sourceLabels, configuration.targetLabel);
     }
+
+    // make alphabets now, after labels were potentially remapped 
+    dataset.makeAlphabets();
+    
+    System.out.println("unlabeled size: " + unlabeled.size());
     
     Split[] splits = dataset.split(Constants.folds);
     double cumulativeAccuracy = 0;
