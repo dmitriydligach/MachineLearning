@@ -161,10 +161,6 @@ public class EmModel {
 	/**
    * Classify instances in a dataset. Also set probability distribution
    * over classes for each instance. Return accuracy.
-   * 
-   * TODO: Probably don't need to calc accuracy here
-   * TODO: also figure out a better way to handle null labels
-   * TODO: when creating a new instance, set label to null, not ""
    */
   public double label(Dataset dataset) {
     
@@ -190,6 +186,31 @@ public class EmModel {
     }
 
     return (double) correct / total;
+  }
+  
+  /**
+   * A copy of method above that's different in two ways:
+   * 
+   * 1. No accuracy calculation is done here.
+   * 2. Instances' "label" field is overwritten with prediction
+   * 
+   * Eventually, this version should the replace the one above.
+   */
+  public void label2(Dataset dataset) {
+    
+    for(Instance instance : dataset.getInstances()) {
+      double[] logSum = getUnnormalizedClassLogProbs(instance);
+      double[] p = logToProb(logSum);
+      
+      Map<String, Float> labelProbabilityDistribution = new HashMap<String, Float>();
+      for(int label = 0; label < numClasses; label++) {
+        labelProbabilityDistribution.put(labelAlphabet.getString(label), (float)p[label]);
+      }
+      instance.setLabelProbabilityDistribution(labelProbabilityDistribution); 
+
+      String prediction = labelAlphabet.getString(Misc.getIndexOfLargestElement(p));
+      instance.setLabel(prediction);
+    }
   }
 			
 	 /**
