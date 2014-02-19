@@ -23,11 +23,15 @@ public class Instance {
 	// probability distribution over classes
 	private Map<String, Float> labels;
 	
+	// field that can hold anything
+	private String misc;
+	
 	public Instance() {
 		label = "";
 		features = new HashMap<String, Float>();
 		vector = new TreeMap<Integer, Float>();
 		labels = new HashMap<String, Float>();
+		misc = "";
 	}
 
 	/**
@@ -117,6 +121,14 @@ public class Instance {
 	public void setLabel(String label) {
 	  this.label = label;
   }
+	
+	public String getMisc() {
+	  return misc;
+	}
+	
+	public void setMisc(String misc) {
+	  this.misc = misc;
+	}
 	
 	/**
 	 * Represent sparse vector as string using the following format:
