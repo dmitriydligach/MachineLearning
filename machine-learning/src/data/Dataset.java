@@ -484,6 +484,7 @@ public class Dataset {
 	/**
 	 * Remove label from 'label' field and copy it to 'misc' field.
 	 * Can be useful for evaluations / sanity checking.
+	 * WARNING: This method modifies the dataset.
 	 */
 	public void hideLabels() {
 	  
