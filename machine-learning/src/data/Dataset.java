@@ -480,4 +480,16 @@ public class Dataset {
 	    instance.normalize();
 	  }
 	}
+	
+	/**
+	 * Remove label from 'label' field and copy it to 'misc' field.
+	 * Can be useful for evaluations / sanity checking.
+	 */
+	public void hideLabels() {
+	  
+	  for(Instance instance : instances) {
+	    instance.setMisc(instance.getLabel());
+	    instance.setLabel("");
+	  }
+	}
 }
