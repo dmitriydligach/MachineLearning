@@ -15,7 +15,7 @@ import em.implementation.EmModel;
  */
 public class Model {
   
-  public static final int numSamples = 100;
+  public static final int numSamples = 20;
   
   // hyperparameters of beta distribution
   public static final double[] betaParams = {1, 1};  
@@ -96,6 +96,8 @@ public class Model {
 	  classifier.label2(test);
 	  
 	  all = new Dataset(labeled.getInstances(), unlabeled.getInstances(), test.getInstances());
+	  all.setAlphabets(labelAlphabet, featureAlphabet);
+	  all.makeVectors();
 	  
 	  // compute counts
 	  computeLabelCounts(all);
