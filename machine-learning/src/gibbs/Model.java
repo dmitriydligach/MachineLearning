@@ -18,12 +18,10 @@ public class Model {
   public static final int numSamples = 100;
   
   // hyperparameters of beta distribution
-  public static final double[] betaParams = {1, 1};
-  
+  public static final double[] betaParams = {1, 1};  
   // hyperparameters of dirichlet distribution
   public static final double[] dirichletParams = {1, 1};
 
-  
 	// number of classes
 	protected int numClasses;
 	// number of words (features)
@@ -45,6 +43,8 @@ public class Model {
 
 	// map labels to ints and ints to labels
 	Alphabet labelAlphabet;
+	// word to ints mapping
+	Alphabet featureAlphabet;
 
 	// may not need a class member
 	public Dataset labeled;
@@ -53,15 +53,20 @@ public class Model {
 	public Dataset all;
 	
 	// constructor
-	public Model(Dataset labeled, Dataset unlabeled, Dataset test) {
+	public Model(Dataset labeled, Dataset unlabeled, Dataset test, Alphabet featureAlphabet, Alphabet labelAlphabet) {
 	  
-	  all = new Dataset(labeled.getInstances(), unlabeled.getInstances(), test.getInstances());
-	  all.makeAlphabets();
-	  labelAlphabet = all.getLabelAlphabet();
+	  test.hideLabels();
+	  
+	  this.labeled = labeled;
+	  this.unlabeled = unlabeled;
+	  this.test = test;
+	  
+	  this.labelAlphabet = labelAlphabet;
+	  this.featureAlphabet = featureAlphabet;
 
 	  numClasses = labelAlphabet.size();
-	  numWords = all.getFeatureAlphabet().size(); // alphabet from labeled maybe?
-	  numInstances = all.size();
+	  numWords = featureAlphabet.size(); 
+	  numInstances = labeled.size() + unlabeled.size() + test.size();
 	  
 	  labelCounts = new int[numClasses];
 	  wordCounts = new double[numClasses][numWords];
@@ -71,31 +76,26 @@ public class Model {
 	  theta = new double[numClasses][numWords];
 	}
 	
-	public void run() {
-	  
-	  initialize();
-	  
-	  for(int sample = 0; sample < numSamples; sample++) {
-	    sample();
-	  }
-	}
-	
 	public void initialize() {
 	  
 	  // label unlabeled examples
-	  
-	  labeled.makeAlphabets();
-	  labeled.makeVectors();
-	  unlabeled.setAlphabets(labeled.getLabelAlphabet(), labeled.getFeatureAlphabet());
-	  test.setAlphabets(labeled.getLabelAlphabet(), labeled.getFeatureAlphabet());
-	  unlabeled.makeVectors();
-	  test.makeAlphabets();
-	  
 	  labeled.setInstanceClassProbabilityDistribution(new HashSet<String>(labelAlphabet.getStrings()));
+	  labeled.setAlphabets(labelAlphabet, featureAlphabet);
+	  labeled.makeVectors();
+	  
 	  EmModel classifier = new EmModel(labelAlphabet);
 	  classifier.train(labeled);
-	  classifier.label(unlabeled);
-	  classifier.label(test);
+	    
+	  unlabeled.setAlphabets(labelAlphabet, featureAlphabet);
+	  unlabeled.makeVectors();
+	  
+	  test.setAlphabets(labelAlphabet, featureAlphabet);
+	  test.makeVectors();
+	  
+	  classifier.label2(unlabeled);
+	  classifier.label2(test);
+	  
+	  all = new Dataset(labeled.getInstances(), unlabeled.getInstances(), test.getInstances());
 	  
 	  // compute counts
 	  computeLabelCounts(all);
@@ -148,6 +148,15 @@ public class Model {
 	  
 	}
 	
+	public void run() {
+
+	  initialize();
+
+	  for(int sample = 0; sample < numSamples; sample++) {
+	    sample();
+	  }
+	}
+	 
 	/**
 	 * Train a multinomial naive bayes model using a dataset.
 	 */
