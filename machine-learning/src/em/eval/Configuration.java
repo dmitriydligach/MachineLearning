@@ -68,7 +68,7 @@ public class Configuration {
       sourceLabelSet = Constants.msSourceLabels;
       targetLabel = Constants.msTargetLabel;
     } else if(phenotype.equals("t2d")) {
-      dataFile = Constants.ucData;
+      dataFile = Constants.t2dData;
       labelFile = Constants.t2dLabels;
       sourceLabelSet = Constants.t2dSourceLabels;
       targetLabel = Constants.t2dTargetLabel;
