@@ -1,5 +1,6 @@
 package gibbs;
 
+import java.util.Arrays;
 import java.util.HashSet;
 
 import cc.mallet.types.Dirichlet;
@@ -15,7 +16,7 @@ import em.implementation.EmModel;
  */
 public class Model {
   
-  public static final int numSamples = 20;
+  public static final int numSamples = 10;
   
   // hyperparameters of beta distribution
   public static final double[] betaParams = {1, 1};  
@@ -51,10 +52,11 @@ public class Model {
 	public Dataset unlabeled;
 	public Dataset test;
 	public Dataset all;
+	public Dataset sampled; 
 	
 	// constructor
-	public Model(Dataset labeled, Dataset unlabeled, Dataset test, Alphabet featureAlphabet, Alphabet labelAlphabet) {
-	  
+	public Model(Dataset labeled, Dataset unlabeled, Dataset test, Alphabet labelAlphabet, Alphabet featureAlphabet) {
+
 	  test.hideLabels();
 	  
 	  this.labeled = labeled;
@@ -105,11 +107,14 @@ public class Model {
 	  computeTotalClassWords(all);
 	  
 	  computeTheta();
+	  
+	  // instances that need to be sampled
+	  sampled = new Dataset(unlabeled.getInstances(), test.getInstances());
 	}
 	
 	public void sample() {
-	  
-	  for(Instance instance : unlabeled.getInstances()) {
+
+	  for(Instance instance : sampled.getInstances()) {
 
 	    // subtract this instance's word counts and label counts
 	    int oldLabel = labelAlphabet.getIndex(instance.getLabel());
@@ -122,10 +127,16 @@ public class Model {
 	      wordCounts[oldLabel][word] -= wordCount;
 	    }
 	    
-	    double[] logSum = getUnnormalizedLogProbForClasses(instance);
+	    double[] logSum = getUnnormalizedLogProbForClasses(instance); 
 	    double[] p = logToProb(logSum[0], logSum[1]);
 	    int newLabel = Math.random() < p[0] ? 0 : 1;
 	    instance.setLabel(labelAlphabet.getString(newLabel));
+	    
+	    // keep track of lables for the test set
+	    if(instance.getMisc() != null) {
+	      instance.labelList.add(newLabel);
+	      System.out.println(instance.labelList);
+	    }
 	   
 	    // add counts back
 	    labelCounts[newLabel]++;
@@ -148,15 +159,6 @@ public class Model {
 	    }
 	  }
 	  
-	}
-	
-	public void run() {
-
-	  initialize();
-
-	  for(int sample = 0; sample < numSamples; sample++) {
-	    sample();
-	  }
 	}
 	 
 	/**
@@ -283,5 +285,24 @@ public class Model {
 			int label = labelAlphabet.getIndex(instance.getLabel());
 			totalClassWords[label] += instance.getTotalMass();
 		}
+	}
+	
+	/**
+	 * Run sampler.
+	 */
+	public void run() {
+
+	  initialize();
+	  for(int sample = 0; sample < numSamples; sample++) {
+	    System.out.println("sample: " + sample);
+	    sample();
+	  }
+	}
+	
+	public void evaluate() {
+	  
+	  for(Instance instance : all.getInstances()) {
+	    // System.out.println(instance.labelList);
+	  }
 	}
 }
