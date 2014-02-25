@@ -44,10 +44,8 @@ public class Evaluate {
 
       Model sampler = new Model(labeled, unlabeled, test, dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
       sampler.run();
-      sampler.evaluate();
-      
-      // double accuracy = sampler.evaluate();
-      // cumulativeAccuracy += accuracy;
+      double accuracy = sampler.evaluate();
+      cumulativeAccuracy += accuracy;
     }
 
     return cumulativeAccuracy / numFolds;    

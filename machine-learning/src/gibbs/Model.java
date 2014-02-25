@@ -135,7 +135,6 @@ public class Model {
 	    // keep track of lables for the test set
 	    if(instance.getMisc() != null) {
 	      instance.labelList.add(newLabel);
-	      System.out.println(instance.labelList);
 	    }
 	   
 	    // add counts back
@@ -294,15 +293,35 @@ public class Model {
 
 	  initialize();
 	  for(int sample = 0; sample < numSamples; sample++) {
-	    System.out.println("sample: " + sample);
 	    sample();
 	  }
 	}
 	
-	public void evaluate() {
+	public double evaluate() {
+
+	  int correct = 0;
 	  
-	  for(Instance instance : all.getInstances()) {
-	    // System.out.println(instance.labelList);
+	  for(Instance instance : sampled.getInstances()) {
+	    if(instance.getMisc() != null) {
+	      
+	      double cumulative = 0;
+	      for(int label : instance.labelList) {
+	        cumulative += label;
+	      }
+	      
+	      int prediction;
+	      if((cumulative / numSamples) < 0.5) {
+	        prediction = 0;
+	      } else {
+	        prediction = 1;
+	      }
+	      
+	      if(labelAlphabet.getString(prediction).equals(instance.getMisc())) {
+	        correct++;
+	      }
+	    }
 	  }
+
+	  return (double) correct / test.size();
 	}
 }
