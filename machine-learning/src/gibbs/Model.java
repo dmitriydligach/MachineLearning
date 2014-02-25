@@ -1,6 +1,5 @@
 package gibbs;
 
-import java.util.Arrays;
 import java.util.HashSet;
 
 import cc.mallet.types.Dirichlet;
@@ -51,7 +50,6 @@ public class Model {
 	public Dataset labeled;
 	public Dataset unlabeled;
 	public Dataset test;
-	public Dataset all;
 	public Dataset sampled; 
 	
 	// constructor
@@ -97,7 +95,7 @@ public class Model {
 	  classifier.label2(unlabeled);
 	  classifier.label2(test);
 	  
-	  all = new Dataset(labeled.getInstances(), unlabeled.getInstances(), test.getInstances());
+	  Dataset all = new Dataset(labeled.getInstances(), unlabeled.getInstances(), test.getInstances());
 	  all.setAlphabets(labelAlphabet, featureAlphabet);
 	  all.makeVectors();
 	  
@@ -159,21 +157,6 @@ public class Model {
 	  }
 	  
 	}
-	 
-	/**
-	 * Train a multinomial naive bayes model using a dataset.
-	 */
-	public void train(Dataset dataset) {
-		
-		// compute various useful counts
-		computeWordCounts(dataset);
-		computeLabelCounts(dataset);
-		computeTotalClassWords(dataset);
-		
-		// compute naive bayes parameters
-		computeTheta();
-		computePriors();
-	}
 
 	/**
 	 * Convert two unnormalized log probs to probabilities.
@@ -230,16 +213,6 @@ public class Model {
 			for(int word = 0; word < numWords; word++) {
 				theta[label][word] = (wordCounts[label][word] + 1) / (totalClassWords[label] + numWords);
 			}
-		}
-	}
-	
-	/**
-	 * Compute p(c) parameters.
-	 */
-	public void computePriors() {
-		
-		for(int label = 0; label < numClasses; label++) {
-			priors[label] = (double) labelCounts[label] / numInstances;
 		}
 	}
 	
