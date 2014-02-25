@@ -26,6 +26,7 @@ public class Evaluate {
     // load labeled data
     I2b2Dataset dataset = new I2b2Dataset();
     dataset.loadCSVFile(dataPath, labelPath);
+    dataset.makeAlphabets();
     
     // load unlabeled data
     I2b2Dataset unlabeled = new I2b2Dataset();
@@ -41,8 +42,9 @@ public class Evaluate {
 
       labeled.add(nontest.popRandom(numLabeled, new Random(100)));
 
-      Model sampler = new Model(labeled, unlabeled, test);
+      Model sampler = new Model(labeled, unlabeled, test, dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
       sampler.run();
+      sampler.evaluate();
       
       // double accuracy = sampler.evaluate();
       // cumulativeAccuracy += accuracy;
