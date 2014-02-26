@@ -1,5 +1,9 @@
 package gibbs;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import cc.mallet.types.Dirichlet;
@@ -38,8 +42,6 @@ public class Model {
 
 	// p(w|c) for all classes 
 	protected double[][] theta;
-	// p(c) for all classes
-	protected double[] priors;
 
 	// map labels to ints and ints to labels
 	Alphabet labelAlphabet;
@@ -55,8 +57,6 @@ public class Model {
 	// constructor
 	public Model(Dataset labeled, Dataset unlabeled, Dataset test, Alphabet labelAlphabet, Alphabet featureAlphabet) {
 
-	  test.hideLabels();
-	  
 	  this.labeled = labeled;
 	  this.unlabeled = unlabeled;
 	  this.test = test;
@@ -72,7 +72,6 @@ public class Model {
 	  wordCounts = new double[numClasses][numWords];
 	  totalClassWords = new int[numClasses];
 
-	  priors = new double[numClasses];
 	  theta = new double[numClasses][numWords];
 	}
 	
@@ -108,10 +107,12 @@ public class Model {
 	  
 	  // instances that need to be sampled
 	  sampled = new Dataset(unlabeled.getInstances(), test.getInstances());
+	  sampled.setAlphabets(labelAlphabet, featureAlphabet);
+	  sampled.makeVectors();
 	}
 	
 	public void sample() {
-
+	  
 	  for(Instance instance : sampled.getInstances()) {
 
 	    // subtract this instance's word counts and label counts
@@ -126,7 +127,7 @@ public class Model {
 	    }
 	    
 	    double[] logSum = getUnnormalizedLogProbForClasses(instance); 
-	    double[] p = logToProb(logSum[0], logSum[1]);
+	    double[] p = logToProb(logSum);
 	    int newLabel = Math.random() < p[0] ? 0 : 1;
 	    instance.setLabel(labelAlphabet.getString(newLabel));
 	    
@@ -155,25 +156,57 @@ public class Model {
 	      theta[label] = dir.nextDistribution();
 	    }
 	  }
-	  
 	}
-
-	/**
-	 * Convert two unnormalized log probs to probabilities.
-	 */
-	public double[] logToProb(double logP0, double logP1) {
-
-		double[] p = new double[2];
-		
-		// odds0 is p0/p1 or p0 / (1 - p0)
-		double odds0 = Math.pow(10, logP0 - logP1);
-
-		p[0] = odds0 / (1 + odds0);
-		p[1] = 1 / (1 + odds0);
-		
-		return p;
-	}
+    
+  /**
+   * Convert unnormalized log probabilities to probabilities for each class.
+   */
+  public double[] logToProb(double[] unnormalizedClassLogProbs) {
+   
+    double[] probs = new double[unnormalizedClassLogProbs.length];
+    
+    // unnormalized probabilities are often very small, e.g. 10^-802.345
+    // which causes an underflow, so need to use big decimal instead
+    BigDecimal[] unnormalizedClassProbs = new BigDecimal[unnormalizedClassLogProbs.length];
+      
+    // we have log(p(c)p(w_0|c)...p(w_n-1|c)) for each class
+    // compute unnormalized probabilities as 10^(p(c)p(w_0|c)...p(w_n-1|c))
+    for(int label = 0; label < numClasses; label++) {
+      unnormalizedClassProbs[label] = powerOfTen(unnormalizedClassLogProbs[label]);
+    }
+    
+    // compute the normalization constant
+    BigDecimal normalizer = new BigDecimal(0);
+    for(int label = 0; label < numClasses; label++) {
+      normalizer = normalizer.add(unnormalizedClassProbs[label]);
+    }
+    
+    for(int label = 0; label < numClasses; label++) {
+      probs[label] = unnormalizedClassProbs[label].divide(normalizer, RoundingMode.HALF_UP).doubleValue();
+    }
+    
+    return probs;
+  }
 	
+  /**
+   * Calculate 10^exponent when y is very small and fractional.
+   * Basically split exponent into its integer i and fractional f parts.
+   * I.e. 10^exponent = 10^(i + f) = 10^i * 10^f
+   */
+  private static BigDecimal powerOfTen(double exponent) {
+    
+    BigDecimal exponentAsBigDecimal = new BigDecimal(String.valueOf(exponent));
+    BigDecimal integerPart = new BigDecimal(exponentAsBigDecimal.intValue());
+    BigDecimal fractionalPart = exponentAsBigDecimal.subtract(integerPart);
+
+    BigDecimal tenToIntegerPart = new BigDecimal(BigInteger.valueOf(10), -1 * integerPart.intValue());
+    BigDecimal tenToFractionalPart = new BigDecimal(Math.pow(10, fractionalPart.doubleValue()));
+    
+    BigDecimal result = tenToIntegerPart.multiply(tenToFractionalPart);
+    
+    return result;
+  }
+  
   private double[] getUnnormalizedLogProbForClasses(Instance instance){
     // equation 49 from "Gibbs Sampling for the Uninitiated" by Resnik and Hardisty (June 2010 version)
     
@@ -187,7 +220,12 @@ public class Model {
       logSum[label] = Math.log10(outer);
       
       for(int word = 0; word < numWords; word++) {
-        double inner = wordCounts[label][word] * Math.log10(theta[label][word]);
+        Float wordCount = instance.getDimensionValue(word);
+        if(wordCount == null) {
+          continue;
+        }
+        
+        double inner = wordCount * Math.log10(theta[label][word]);
         logSum[label] += inner;
       }
     }
@@ -276,14 +314,14 @@ public class Model {
 	  
 	  for(Instance instance : sampled.getInstances()) {
 	    if(instance.getMisc() != null) {
-	      
-	      double cumulative = 0;
+
+	      int cumulative = 0;
 	      for(int label : instance.labelList) {
 	        cumulative += label;
 	      }
-	      
+
 	      int prediction;
-	      if((cumulative / numSamples) < 0.5) {
+	      if(((double) cumulative / numSamples) < 0.5) {
 	        prediction = 0;
 	      } else {
 	        prediction = 1;
