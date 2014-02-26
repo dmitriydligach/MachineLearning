@@ -24,14 +24,18 @@ public class Instance {
 	private Map<String, Float> labels;
 	
 	// field that can hold anything
-	private String misc;
+	private String temp;
+	
+	// list of labels (e.g. for gibbs sampling)
+	private List<Integer> sequence;
 	
 	public Instance() {
 		label = "";
 		features = new HashMap<String, Float>();
 		vector = new TreeMap<Integer, Float>();
 		labels = new HashMap<String, Float>();
-		misc = "";
+		temp = null;
+		sequence = new ArrayList<Integer>();
 	}
 
 	/**
@@ -42,7 +46,12 @@ public class Instance {
 		label = sourceInstance.getLabel();
 		features = new HashMap<String, Float>();
 		vector = new TreeMap<Integer, Float>(); 
-		labels = sourceInstance.getClassProbabilities(); // TODO: figure out where to set this
+		labels = sourceInstance.getClassProbabilities(); 
+		temp = sourceInstance.getTemp();
+		sequence = new ArrayList<Integer>();
+		for(Integer label : sourceInstance.getSequence()) {
+		  sequence.add(label);
+		}
 		
 		// features can be removed by feature selection, so need deep copy
 		// features = sourceInstance.getFeatures(); 
@@ -122,12 +131,20 @@ public class Instance {
 	  this.label = label;
   }
 	
-	public String getMisc() {
-	  return misc;
+	public String getTemp() {
+	  return temp;
 	}
 	
-	public void setMisc(String misc) {
-	  this.misc = misc;
+	public void setTemp(String misc) {
+	  this.temp = misc;
+	}
+	
+	public List<Integer> getSequence() {
+	  return sequence;
+	}
+	
+	public void addToSequence(int value) {
+	  sequence.add(value);
 	}
 	
 	/**
