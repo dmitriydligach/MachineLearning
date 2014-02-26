@@ -482,15 +482,28 @@ public class Dataset {
 	}
 	
 	/**
-	 * Remove label from 'label' field and copy it to 'misc' field.
+	 * Remove label from 'label' field and copy it to 'temp' field.
 	 * Can be useful for evaluations / sanity checking.
 	 * WARNING: This method modifies the dataset.
 	 */
 	public void hideLabels() {
 	  
 	  for(Instance instance : instances) {
-	    instance.setMisc(instance.getLabel());
-	    instance.setLabel("");
+	    instance.setTemp(instance.getLabel());
+	    instance.setLabel(null);
 	  }
 	}
+	
+	/**
+   * Remove label from 'temp' field and copy it to 'label' field.
+   * This method should be run after hideLabels() to restore the original state.
+   * WARNING: This method modifies the dataset.
+   */
+  public void restoreLabels() {
+    
+    for(Instance instance : instances) {
+      instance.setLabel(instance.getTemp());
+      instance.setTemp(null);
+    }
+  }
 }
