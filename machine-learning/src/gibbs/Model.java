@@ -3,7 +3,6 @@ package gibbs;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.Arrays;
 import java.util.HashSet;
 
 import cc.mallet.types.Dirichlet;
@@ -19,7 +18,7 @@ import em.implementation.EmModel;
  */
 public class Model {
   
-  public static final int numSamples = 10;
+  public static final int numSamples = 20;
   
   // hyperparameters of beta distribution
   public static final double[] betaParams = {1, 1};  
@@ -84,13 +83,10 @@ public class Model {
 	  
 	  EmModel classifier = new EmModel(labelAlphabet);
 	  classifier.train(labeled);
-	    
 	  unlabeled.setAlphabets(labelAlphabet, featureAlphabet);
-	  unlabeled.makeVectors();
-	  
 	  test.setAlphabets(labelAlphabet, featureAlphabet);
+	  unlabeled.makeVectors();
 	  test.makeVectors();
-	  
 	  classifier.label2(unlabeled);
 	  classifier.label2(test);
 	  
@@ -131,7 +127,7 @@ public class Model {
 	    int newLabel = Math.random() < p[0] ? 0 : 1;
 	    instance.setLabel(labelAlphabet.getString(newLabel));
 	    
-	    // keep track of lables for the test set
+	    // keep track of labels for the test set
 	    if(instance.getMisc() != null) {
 	      instance.labelList.add(newLabel);
 	    }
