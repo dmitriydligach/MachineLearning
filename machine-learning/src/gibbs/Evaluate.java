@@ -14,7 +14,7 @@ public class Evaluate {
   public static final String dataPath = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt";
   public static final String labelPath = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-cd.txt";
   public static final int numUnlabeled = 1000;
-  public static final int numLabeled = 20;
+  public static final int numLabeled = 10;
   public static final int numFolds = 10;
 
   public static void main(String[] args) throws FileNotFoundException {
