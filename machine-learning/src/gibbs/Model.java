@@ -53,7 +53,9 @@ public class Model {
   public Dataset test;
   public Dataset sampled; 
 
-  // constructor
+  /**
+   * Constructor.
+   */
   public Model(Dataset labeled, Dataset unlabeled, Dataset test, Alphabet labelAlphabet, Alphabet featureAlphabet) {
 
     this.labeled = labeled;
@@ -74,6 +76,9 @@ public class Model {
     theta = new double[numClasses][numWords];
   }
 
+  /**
+   * Set initial model parameters and counts.
+   */
   public void initialize() {
 
     // label unlabeled examples
@@ -83,10 +88,12 @@ public class Model {
 
     EmModel classifier = new EmModel(labelAlphabet);
     classifier.train(labeled);
+    
     unlabeled.setAlphabets(labelAlphabet, featureAlphabet);
     test.setAlphabets(labelAlphabet, featureAlphabet);
     unlabeled.makeVectors();
     test.makeVectors();
+    
     classifier.label2(unlabeled);
     classifier.label2(test);
 
@@ -99,6 +106,7 @@ public class Model {
     computeWordCounts(all);
     computeTotalClassWords(all);
 
+    // compute p(w|c)
     computeTheta();
 
     // instances that need to be sampled
@@ -107,6 +115,9 @@ public class Model {
     sampled.makeVectors();
   }
 
+  /**
+   * A single sampling iteration.
+   */
   public void sample() {
 
     for(Instance instance : sampled.getInstances()) {
@@ -127,7 +138,8 @@ public class Model {
       int newLabel = Math.random() < p[0] ? 0 : 1;
       instance.setLabel(labelAlphabet.getString(newLabel));
 
-      // keep track of labels for the test set
+      // keep track of labels for the test set 
+      // assumption: test set has gold labels in 'temp' field
       if(instance.getTemp() != null) {
         instance.addToSequence(newLabel);
       }
@@ -154,8 +166,11 @@ public class Model {
     }
   }
 
+  /**
+   * Equation 49 from "Gibbs Sampling for the Uninitiated" by Resnik and Hardisty (June 2010 version).
+   * Compute log[p(c)p(w_0|c)...p(w_n-1|c)] = log[p(c)] + log[p(w_0|c)] + ... + log[p(w_n-1|c)]
+   */
   private double[] getUnnormalizedLogProbForClasses(Instance instance){
-    // equation 49 from "Gibbs Sampling for the Uninitiated" by Resnik and Hardisty (June 2010 version)
 
     double[] logSum = new double[numClasses];
 
@@ -313,9 +328,8 @@ public class Model {
     int correct = 0;
 
     for(Instance instance : sampled.getInstances()) {
+      // only evaluate instances from test set
       if(instance.getTemp() != null) {
-        // this is the test set
-        
         int cumulative = 0;
         for(int label : instance.getSequence()) {
           cumulative += label;

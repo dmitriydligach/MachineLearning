@@ -14,7 +14,7 @@ public class Evaluate {
   public static final String dataPath = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt";
   public static final String labelPath = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-cd.txt";
   public static final int numUnlabeled = 1000;
-  public static final int numLabeled = 10;
+  public static final int numLabeled = 25;
   public static final int numFolds = 10;
 
   public static void main(String[] args) throws FileNotFoundException {
@@ -45,13 +45,13 @@ public class Evaluate {
       Dataset test = splits[fold].getTestSet();
 
       labeled.add(nontest.popRandom(numLabeled, new Random(100)));
-
       test.hideLabels();
+      
       Model sampler = new Model(labeled, unlabeled, test, dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
       sampler.run();
       double accuracy = sampler.evaluate();
+      
       test.restoreLabels();
-
       cumulativeAccuracy += accuracy;
     }
 
