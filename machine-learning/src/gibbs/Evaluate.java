@@ -1,8 +1,13 @@
 package gibbs;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Random;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 
 import data.Dataset;
 import data.I2b2Dataset;
@@ -13,19 +18,29 @@ public class Evaluate {
 
   public static final String dataPath = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt";
   public static final String labelPath = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-cd.txt";
+  public static final String outfile = "/Users/Dima/Boston/Output/gibbs.txt";
   public static final int numUnlabeled = 1000;
-  public static final int numLabeled = 25;
   public static final int numFolds = 10;
+  public static final int step = 5;
+  public static final int maxLabeled = 300;
 
-  public static void main(String[] args) throws FileNotFoundException {
+  public static void main(String[] args) throws IOException {
 
-    double baselineAccuracy = baseline();
-    System.out.println("baseline accuracy: " + baselineAccuracy);
-    double gibbsAccuracy = evaluate();
-    System.out.println("sampling accuracy: " + gibbsAccuracy);
+    File file = new File(outfile);
+    if(file.exists()) {
+      System.out.println(outfile + " already exists... deleting...");
+      file.delete();
+    }
+
+    for(int numLabeled = step; numLabeled < maxLabeled; numLabeled += step) {
+      double labeledOnlyAccuracy = baseline(numLabeled);
+      double labeledAndUnlabeledAccuracy = evaluate(numLabeled);
+      String out = String.format("%d %.4f %.4f\n", numLabeled, labeledOnlyAccuracy, labeledAndUnlabeledAccuracy);
+      Files.append(out, file, Charsets.UTF_8);
+    }
   }
 
-  public static double evaluate() throws FileNotFoundException {
+  public static double evaluate(int numLabeled) throws FileNotFoundException {
 
     // load labeled data
     I2b2Dataset dataset = new I2b2Dataset();
@@ -61,7 +76,7 @@ public class Evaluate {
   /**
    * Use labeled data only.
    */
-  public static double baseline() throws FileNotFoundException {
+  public static double baseline(int numLabeled) throws FileNotFoundException {
 
     I2b2Dataset dataset = new I2b2Dataset();
     dataset.loadCSVFile(dataPath, labelPath);
