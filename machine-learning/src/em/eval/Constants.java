@@ -8,7 +8,7 @@ public class Constants {
   
   public final static int folds = 10;
   public final static int maxLabeled = 500;
-  public final static int step = 5;
+  public final static int step = 10;
   public final static int iterations = 25;
   
   public final static int[] unlabeledSizes = {500, 1000, 3000, 5000};

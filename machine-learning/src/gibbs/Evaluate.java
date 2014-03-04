@@ -19,12 +19,12 @@ import em.implementation.EmModel;
 
 public class Evaluate {
 
-  public static final String phenotype = "cd";
+  public static final String phenotype = "t2d";
   public static final boolean normalize = false;
   
   public static void main(String[] args) throws IOException {
     
-    File file = new File(Constants.outputDir + phenotype + ".txt");
+    File file = new File(Constants.outputDir + phenotype + (normalize ? "-normalized" : "") + ".txt");
     if(file.exists()) {
       System.out.println(file.getName() + " already exists... deleting...");
       file.delete();
