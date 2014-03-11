@@ -115,41 +115,6 @@ public class Model {
     sampled.setAlphabets(labelAlphabet, featureAlphabet);
     sampled.makeVectors();
   }
-
-  /**
-   * Sample paramaters instead of MLE initialization.
-   */
-  public void initializeBySamplingLabels() {
-
-    Randoms random = new Randoms();
-    double pi = random.nextBeta(betaParams[0], betaParams[1]); // p(class = 0)
-    
-    for(Instance instance : unlabeled.getInstances()) {
-      int label = Math.random() < pi ? 0 : 1; 
-      instance.setLabel(labelAlphabet.getString(label));
-    }
-    for(Instance instance : test.getInstances()) {
-      int label = Math.random() < pi ? 0 : 1; 
-      instance.setLabel(labelAlphabet.getString(label));
-    }    
-    
-    Dataset all = new Dataset(labeled.getInstances(), unlabeled.getInstances(), test.getInstances());
-    all.setAlphabets(labelAlphabet, featureAlphabet);
-    all.makeVectors();
-
-    // compute counts
-    computeLabelCounts(all);
-    computeWordCounts(all);
-    computeTotalClassWords(all);
-
-    // compute p(w|c)
-    computeTheta();
-
-    // wrap instances that need to be sampled into a dataset object
-    sampled = new Dataset(unlabeled.getInstances(), test.getInstances());
-    sampled.setAlphabets(labelAlphabet, featureAlphabet);
-    sampled.makeVectors();
-  }
   
   /**
    * Sample thetas from Dirichlet instead of computing MLE.
@@ -346,7 +311,7 @@ public class Model {
       }
     }
   }
-
+  
   /**
    * Compute feature frequency n x m matrix, where
    * n: number of classes, m: number of dimensions
