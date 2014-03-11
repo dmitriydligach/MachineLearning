@@ -15,7 +15,7 @@ public class GibbsVsBaseline {
   public static final String dataPath = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt";
   public static final String labelPath = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-cd.txt";
   public static final String outfile = "/Users/Dima/Boston/Output/gibbs.txt";
-  public static final int numLabeled = 20;
+  public static final int numLabeled = 30;
   public static final int numUnlabeled = 1000;
   public static final int numFolds = 10;
 
