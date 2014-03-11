@@ -19,8 +19,8 @@ import em.implementation.EmModel;
 
 public class Evaluate {
 
-  public static final String phenotype = "t2d";
-  public static final boolean normalize = false;
+  public static final String phenotype = "cd";
+  public static final boolean normalize = true;
   
   public static void main(String[] args) throws IOException {
     
@@ -66,7 +66,7 @@ public class Evaluate {
     unlabeled.loadFromCSVFile(configuration.dataPath, configuration.labelPath, configuration.numUnlabeled);
     
     if(normalize) {
-      dataset.normalize();
+      // dataset.normalize(); // looks like normalizing labeled data is not a good idea
       unlabeled.normalize();
     }
     if(configuration.sourceLabels != null) {
@@ -108,7 +108,7 @@ public class Evaluate {
     dataset.loadCSVFile(configuration.dataPath, configuration.labelPath);
     
     if(normalize) {
-      dataset.normalize();
+      // dataset.normalize();
     }
     if(configuration.sourceLabels != null) {
       dataset.mapLabels(configuration.sourceLabels, configuration.targetLabel);
