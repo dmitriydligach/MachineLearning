@@ -313,6 +313,21 @@ public class Model {
   }
   
   /**
+   * Sample thetas from Dirichlet distribution.
+   */
+  public void sampleTheta() {
+    
+    for(int label = 0; label < numClasses; label++) {
+      double[] params = new double[numWords];
+      for(int word = 0; word < numWords; word++) {
+        params[word] = wordCounts[label][word] + dirichletParams[label];
+      }
+      Dirichlet dirichlet = new Dirichlet(params);
+      theta[label] = dirichlet.nextDistribution();
+    }
+  }
+  
+  /**
    * Compute feature frequency n x m matrix, where
    * n: number of classes, m: number of dimensions
    * 
