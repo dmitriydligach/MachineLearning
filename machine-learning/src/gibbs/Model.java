@@ -6,7 +6,6 @@ import java.math.RoundingMode;
 import java.util.HashSet;
 
 import cc.mallet.types.Dirichlet;
-import cc.mallet.util.Randoms;
 import data.Alphabet;
 import data.Dataset;
 import data.Instance;
@@ -20,6 +19,7 @@ import em.implementation.EmModel;
 public class Model {
 
   public static final int numSamples = 10;
+  public static final boolean sampleThetaForInit = true;
 
   // hyperparameters of beta distribution
   public static final double[] betaParams = {1, 1};  
@@ -108,52 +108,10 @@ public class Model {
     computeTotalClassWords(all);
 
     // compute p(w|c)
-    computeTheta();
-
-    // wrap instances that need to be sampled into a dataset object
-    sampled = new Dataset(unlabeled.getInstances(), test.getInstances());
-    sampled.setAlphabets(labelAlphabet, featureAlphabet);
-    sampled.makeVectors();
-  }
-  
-  /**
-   * Sample thetas from Dirichlet instead of computing MLE.
-   */
-  public void initializeBySamplingThetas() {
-
-    // label unlabeled examples
-    labeled.setInstanceClassProbabilityDistribution(new HashSet<String>(labelAlphabet.getStrings()));
-    labeled.setAlphabets(labelAlphabet, featureAlphabet);
-    labeled.makeVectors();
-
-    EmModel classifier = new EmModel(labelAlphabet);
-    classifier.train(labeled);
-    
-    unlabeled.setAlphabets(labelAlphabet, featureAlphabet);
-    test.setAlphabets(labelAlphabet, featureAlphabet);
-    unlabeled.makeVectors();
-    test.makeVectors();
-    
-    classifier.label2(unlabeled);
-    classifier.label2(test);
-
-    Dataset all = new Dataset(labeled.getInstances(), unlabeled.getInstances(), test.getInstances());
-    all.setAlphabets(labelAlphabet, featureAlphabet);
-    all.makeVectors();
-
-    // compute counts
-    computeLabelCounts(all);
-    computeWordCounts(all);
-    computeTotalClassWords(all);
-
-    // sample thetas
-    double[][] dirParams = new double[numClasses][numWords];
-    for(int label = 0; label < numClasses; label++) {
-      for(int word = 0; word < numWords; word++) {
-        dirParams[label][word] = wordCounts[label][word] + dirichletParams[label];
-      }
-      Dirichlet dirichlet = new Dirichlet(dirParams[label]);
-      theta[label] = dirichlet.nextDistribution();
+    if(sampleThetaForInit) {
+      sampleTheta();
+    } else {
+      computeTheta();
     }
 
     // wrap instances that need to be sampled into a dataset object
@@ -201,15 +159,7 @@ public class Model {
         wordCounts[newLabel][word] += wordCount;
       }
 
-      // sample thetas
-      double[][] dirParams = new double[numClasses][numWords];
-      for(int label = 0; label < numClasses; label++) {
-        for(int word = 0; word < numWords; word++) {
-          dirParams[label][word] = wordCounts[label][word] + dirichletParams[label];
-        }
-        Dirichlet dir = new Dirichlet(dirParams[label]);
-        theta[label] = dir.nextDistribution();
-      }
+      sampleTheta();
     }
   }
 
@@ -375,8 +325,7 @@ public class Model {
    */
   public void run() {
 
-    // initialize();
-    initializeBySamplingThetas();
+    initialize();
     for(int sample = 0; sample < numSamples; sample++) {
       sample();
     }
