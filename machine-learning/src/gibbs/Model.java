@@ -18,8 +18,8 @@ import em.implementation.EmModel;
  */
 public class Model {
 
-  public static final int numSamples = 10;
-  public static final boolean sampleThetaForInit = true;
+  public static final int numSamples = 50;
+  public static final boolean sampleThetaAtInit = true;
 
   // hyperparameters of beta distribution
   public static final double[] betaParams = {1, 1};  
@@ -108,7 +108,7 @@ public class Model {
     computeTotalClassWords(all);
 
     // compute p(w|c)
-    if(sampleThetaForInit) {
+    if(sampleThetaAtInit) {
       sampleTheta();
     } else {
       computeTheta();

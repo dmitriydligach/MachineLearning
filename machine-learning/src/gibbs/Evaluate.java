@@ -19,7 +19,7 @@ import em.implementation.EmModel;
 
 public class Evaluate {
 
-  public static final String phenotype = "cd";
+  public static final String phenotype = "t2d";
   public static final boolean normalize = false;
   
   public static void main(String[] args) throws IOException {
