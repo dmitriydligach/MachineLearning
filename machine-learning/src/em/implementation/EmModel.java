@@ -10,6 +10,7 @@ import utils.Misc;
 import data.Alphabet;
 import data.Dataset;
 import data.Instance;
+import em.eval.Constants;
 
 /**
  * Implements a multinomial naive bayes classifier as described in:
@@ -65,7 +66,7 @@ public class EmModel {
   
   /**
    * Calculate p(w|c) for all words in training data 
-   * and for each class. Based on equation 5 in the paper.
+   * and for each class. Based on equation 13 in the paper.
    */
   private void computeTheta(Dataset dataset) {
     
@@ -90,7 +91,7 @@ public class EmModel {
   }
   
   /**
-   * Compute the sum from the denominator of Equation 5. 
+   * Compute the sum from the denominator of Equation 13. 
    */
   private double getTotalWordCountInClass(Dataset dataset, int classIndex) {
     
@@ -103,16 +104,17 @@ public class EmModel {
   }
 
   /**
-   * Compute the sum from the numerator of Equation 5.
+   * Compute the sum from the numerator of Equation 13.
    */
   private double getWordCountInClass(Dataset dataset, int wordIndex, int classIndex) {
     
     double sum = 0;
     for(Instance instance : dataset.getInstances()) {
+      double lambda = (instance.getLabel() == null ? Constants.lambda : 1.0);
       String label = labelAlphabet.getString(classIndex);
       Float wordCount = instance.getDimensionValue(wordIndex); // null if count = 0 for this word
       if(wordCount != null) {
-        sum += wordCount * instance.getClassProbability(label); 
+        sum += lambda * wordCount * instance.getClassProbability(label); 
       }
     }
     
@@ -120,19 +122,30 @@ public class EmModel {
   }
   
   /**
-   * Compute p(c) for each class. Basedon on Equation 6 in the paper.
+   * Compute p(c) for each class. Based on on Equation 14 in the paper.
    */
   private void computePriors(Dataset dataset) {
+    
+    int numLabeled = 0;
+    int numUnlabeled = 0;
+    for(Instance instance : dataset.getInstances()) {
+      if(instance.getLabel() == null) {
+        numUnlabeled++;
+      } else {
+        numLabeled++;
+      }
+    }
     
     for(int classIndex = 0; classIndex < numClasses; classIndex++) {
       
       double sum = 0;
       for(Instance instance : dataset.getInstances()) {
+        double lambda = (instance.getLabel() == null ? Constants.lambda : 1.0);
         String label = labelAlphabet.getString(classIndex);
-        sum += instance.getClassProbability(label);
+        sum += lambda * instance.getClassProbability(label);
       }
       
-      priors[classIndex] = (1 + sum) / (numClasses + dataset.size());
+      priors[classIndex] = (1 + sum) / (numClasses + numLabeled + Constants.lambda * numUnlabeled);
       
       assert !Double.isNaN(priors[classIndex]);
       assert !Double.isInfinite(priors[classIndex]);
