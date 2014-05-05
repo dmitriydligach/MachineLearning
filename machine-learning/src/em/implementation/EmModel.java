@@ -173,33 +173,20 @@ public class EmModel {
   }
   
 	/**
-   * Classify instances in a dataset. Also set probability distribution
-   * over classes for each instance. Return accuracy.
+   * Classify instances in a dataset. 
+   * Set probability distribution over classes for each instance.
    */
-  public double label(Dataset dataset) {
-    
-    int correct = 0;
-    int total = 0;
+  public void label(Dataset dataset) {
     
     for(Instance instance : dataset.getInstances()) {
-
       double[] logSum = getUnnormalizedClassLogProbs(instance);
       double[] p = logToProb(logSum);
-      
       Map<String, Float> labelProbabilityDistribution = new HashMap<String, Float>();
       for(int label = 0; label < numClasses; label++) {
         labelProbabilityDistribution.put(labelAlphabet.getString(label), (float)p[label]);
       }
       instance.setLabelProbabilityDistribution(labelProbabilityDistribution); 
-       
-      int prediction = Misc.getIndexOfLargestElement(p);
-      if(instance.getLabel() != null && prediction == labelAlphabet.getIndex(instance.getLabel())) {
-        correct++;
-      }
-      total++;
     }
-
-    return (double) correct / total;
   }
   
   /**
