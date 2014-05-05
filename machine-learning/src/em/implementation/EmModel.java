@@ -159,9 +159,10 @@ public class EmModel {
     
     int correct = 0;
     int total = 0;
-    
+
     for(Instance instance : dataset.getInstances()) {
-      int prediction = classify(instance);
+      // classify by picking class with largest unnormalized log probability
+      int prediction = Misc.getIndexOfLargestElement(getUnnormalizedClassLogProbs(instance));
       if(prediction == labelAlphabet.getIndex(instance.getLabel())) {
         correct++;
       }
@@ -351,12 +352,5 @@ public class EmModel {
     assert !Double.isInfinite(p[1]);
 
     return p;
-  }
-  
-  /**
-   * Classify a document using a multinomial naive bayes model. 
-   */
-  public int classify(Instance instance) {
-    return Misc.getIndexOfLargestElement(getUnnormalizedClassLogProbs(instance));
   }
 }
