@@ -22,8 +22,10 @@ public class EmAlgorithm {
     EmModel em = new EmModel(labelAlphabet);
     em.train(labeled);
     
+    double prevDataLogLikelihood = 0.0;
+    double curDataLogLikelihood = 0.0;
+    
     for(int iteration = 0; iteration < iterations; iteration++) {
-      
       // E-step
       unlabeled.setAlphabets(labelAlphabet, featureAlphabet);
       unlabeled.makeVectors();
@@ -34,8 +36,20 @@ public class EmAlgorithm {
       labeledPlusUnlabeled.setAlphabets(labelAlphabet, featureAlphabet);
       labeledPlusUnlabeled.makeVectors();
       em.train(labeledPlusUnlabeled);
+      
+      if(iteration == 0) {
+        prevDataLogLikelihood = em.getDataLogLikelihood(labeled, unlabeled, 2);
+        continue;
+      } 
+
+      curDataLogLikelihood = em.getDataLogLikelihood(labeled, unlabeled, 2);
+      if(curDataLogLikelihood == prevDataLogLikelihood) {
+        break;
+      } else {
+        prevDataLogLikelihood = curDataLogLikelihood;
+      }
     }
-    
+
     test.setAlphabets(labelAlphabet, featureAlphabet);
     test.makeVectors();
     double accuracy = em.test(test);
