@@ -15,7 +15,7 @@ import em.eval.Constants;
 /**
  * Implements a multinomial naive bayes classifier as described in:
  * 
- * Text Classification from Labeled and Unlabeled Documents using EM (1999)
+ * Text Classification from Labeled and Unlabeled Documents using EM (2000)
  * Kamal Nigam, Andrew Kachites Mccallum, Sebastian Thrun, and Tom Mitchell
  * 
  * @author dmitriy dligach
@@ -190,11 +190,8 @@ public class EmModel {
   }
   
   /**
-   * A copy of method above that's different in two ways:
-   * 
-   * 1. No accuracy calculation is done here.
-   * 2. Instances' "label" field is overwritten with prediction
-   * 
+   * A copy of method above that's different in that
+   * Instances' "label" field is overwritten with prediction.
    * Eventually, this version should the replace the one above.
    */
   public void label2(Dataset dataset) {
@@ -213,7 +210,35 @@ public class EmModel {
       instance.setLabel(prediction);
     }
   }
-			
+
+  /**
+   * Calculate data log-likelihood given current model. 
+   * Based on equation 9 in the paper.
+   */
+  public double getDataLogLikelihood(Dataset labeled, Dataset unlabeled) {
+    
+    double dataLogLikelihood = 0.0; 
+    
+    for(Instance instance : unlabeled.getInstances()) {
+      double[] classLogProbs = getUnnormalizedClassLogProbs(instance);
+      double instanceProbability = 0.0;
+      for(int label = 0; label < numClasses; label++) {
+        instanceProbability = instanceProbability + Math.pow(10, classLogProbs[label]);
+      }
+      if(instanceProbability != 0) {
+        dataLogLikelihood = dataLogLikelihood + Math.log10(instanceProbability);
+      }
+    }
+    
+    for(Instance instance : labeled.getInstances()) {
+      double[] classLogProbs = getUnnormalizedClassLogProbs(instance);
+      double instanceProbability = classLogProbs[labelAlphabet.getIndex(instance.getLabel())];
+      dataLogLikelihood = dataLogLikelihood + instanceProbability;
+    }
+    
+    return dataLogLikelihood;
+  }
+  
 	 /**
    * Calculate for each class:
    * 
