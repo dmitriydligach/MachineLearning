@@ -215,7 +215,7 @@ public class EmModel {
    * Calculate data log-likelihood given current model. 
    * Based on equation 9 in the paper.
    */
-  public double getDataLogLikelihood(Dataset labeled, Dataset unlabeled) {
+  public double getDataLogLikelihood(Dataset labeled, Dataset unlabeled, int numDecimalPlaces) {
     
     double dataLogLikelihood = 0.0; 
     
@@ -236,7 +236,7 @@ public class EmModel {
       dataLogLikelihood = dataLogLikelihood + instanceProbability;
     }
     
-    return dataLogLikelihood;
+    return (double) Math.round(dataLogLikelihood * 10 * numDecimalPlaces) / (10 * numDecimalPlaces);
   }
   
 	 /**
