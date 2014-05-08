@@ -239,6 +239,32 @@ public class EmModel {
     return (double) Math.round(dataLogLikelihood * 10 * numDecimalPlaces) / (10 * numDecimalPlaces);
   }
   
+  /**
+   * Calculate data likelihood given current model. 
+   * Based on equation 8 in the paper.
+   */
+  public BigDecimal getDataLikelihood(Dataset labeled, Dataset unlabeled, int numDecimalPlaces) {
+
+    BigDecimal dataLikelihood = new BigDecimal(0);
+    
+    for(Instance instance : unlabeled.getInstances()) {
+      double[] classLogProbs = getUnnormalizedClassLogProbs(instance); // log[p(class, instance)] for all classess
+      BigDecimal instanceProbability = new BigDecimal(0);              // sum out the class to get p(instance)
+      for(int label = 0; label < numClasses; label++) {
+        instanceProbability = instanceProbability.add(powerOfTen(classLogProbs[label]));
+      }
+      dataLikelihood = dataLikelihood.multiply(instanceProbability);
+    }
+
+    for(Instance instance : labeled.getInstances()) {
+      double[] classLogProbs = getUnnormalizedClassLogProbs(instance);
+      BigDecimal instanceProbability = powerOfTen(classLogProbs[labelAlphabet.getIndex(instance.getLabel())]);
+      dataLikelihood = dataLikelihood.multiply(instanceProbability);  
+    }
+
+    return dataLikelihood;
+  }
+  
 	 /**
    * Calculate for each class:
    * 
