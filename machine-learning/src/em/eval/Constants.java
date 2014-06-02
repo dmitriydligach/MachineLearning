@@ -2,13 +2,14 @@ package em.eval;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 public class Constants {
   
   public final static int folds = 10;
   public final static int maxLabeled = 500;
-  public final static int step = 5;
+  public final static int step = 10;
   public final static int iterations = 25;
   public final static double lambda = 1.0;
   
@@ -32,4 +33,5 @@ public class Constants {
   public static final String t2dTargetLabel = "\"no\"";
   
 	public static final String outputDir = "/Users/Dima/Boston/Output/";
+	public static final Random rndSource = new Random(10);
 }

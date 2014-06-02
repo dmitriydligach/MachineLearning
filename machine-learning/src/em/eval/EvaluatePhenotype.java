@@ -86,7 +86,7 @@ public class EvaluatePhenotype extends Thread {
       Dataset nontest = splits[fold].getPoolSet();
       Dataset test = splits[fold].getTestSet();
 
-      labeled.add(nontest.popRandom(configuration.numLabeled, new Random(100)));
+      labeled.add(nontest.popRandom(configuration.numLabeled, Constants.rndSource));
       double accuracy = EmAlgorithm.runAndEvaluate(
           labeled, 
           unlabeled,
