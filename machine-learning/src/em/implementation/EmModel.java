@@ -240,6 +240,44 @@ public class EmModel {
   }
   
   /**
+   * Calculate data log-likelihood given current model. 
+   * Based on equation 9 in the paper.
+   */
+  public double getDataLogLikelihood2(Dataset labeled, Dataset unlabeled, int numDecimalPlaces) {
+    
+    double dataLogLikelihood = 0.0; 
+    
+    for(Instance instance : unlabeled.getInstances()) {
+      double[] classLogProbs = getUnnormalizedClassLogProbs(instance);
+      BigDecimal instanceProbability = new BigDecimal(0);
+      for(int label = 0; label < numClasses; label++) {
+        instanceProbability = instanceProbability.add(powerOfTen(classLogProbs[label]));
+      }
+      dataLogLikelihood = dataLogLikelihood + log(instanceProbability, 2);
+    }
+    
+    for(Instance instance : labeled.getInstances()) {
+      double[] classLogProbs = getUnnormalizedClassLogProbs(instance);
+      double instanceProbability = classLogProbs[labelAlphabet.getIndex(instance.getLabel())];
+      dataLogLikelihood = dataLogLikelihood + instanceProbability;
+    }
+    
+    return (double) Math.round(dataLogLikelihood * 10 * numDecimalPlaces) / (10 * numDecimalPlaces);
+  }
+  
+  /**
+   * Calculate log of a big decimal.
+   * log10(unsc_val * 10^-scale) = log10(unsc_val) + log10(10^-scale) = log10(unsc_val) - scale
+   */
+  public static double log(BigDecimal argument, int numDecimalPlaces) {
+    // log10(unsc_val * 10^-scale) = log10(unsc_val) + log10(10^-scale) = log10(unsc_val) - scale
+    BigInteger unscaledValue = argument.unscaledValue();
+    double unscaledValueRounded = (double) Math.round(unscaledValue.doubleValue() * 10 * numDecimalPlaces) / (10 * numDecimalPlaces);
+    int scale = argument.scale();
+    return Math.log10(unscaledValueRounded) - scale;
+  }
+  
+  /**
    * Calculate data likelihood given current model. 
    * Based on equation 8 in the paper.
    */
