@@ -108,7 +108,7 @@ public class Instance {
 	 * Sparse vectors may need to be regenerated.
 	 */
 	public void resetVector() {
-	  		
+	  vector = new TreeMap<Integer, Float>();
 	}
 	
 	public void setVector(int dimension, float value) {
