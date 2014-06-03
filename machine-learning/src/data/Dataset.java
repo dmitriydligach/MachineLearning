@@ -24,16 +24,14 @@ public class Dataset {
 
 	// list of examples
 	protected List<Instance> instances;
-	
 	// string->int and int->string mappings
 	protected Alphabet featureAlphabet;
 	protected Alphabet labelAlphabet;
-	
 	// document frequencies for features
 	protected Multiset<String> dfs; 
 
 	/**
-	 * Constructor.
+	 * Constructor
 	 */
 	public Dataset() {
 		instances = new ArrayList<Instance>();
@@ -46,12 +44,10 @@ public class Dataset {
 	 * Create a dataset from a list of instances
 	 */
 	public Dataset(List<Instance> sourceInstances) {
-
 		instances = new ArrayList<Instance>();
 		featureAlphabet = new Alphabet();
 		labelAlphabet = new Alphabet();
 		dfs = HashMultiset.create();
-
 		for(Instance sourceInstance : sourceInstances) {
 			instances.add(new Instance(sourceInstance));
 		}
@@ -61,12 +57,10 @@ public class Dataset {
 	 * Create a dataset from two lists of instances
 	 */
 	public Dataset(List<Instance> sourceInstances1, List<Instance> sourceInstances2) {
-	  
 	  instances = new ArrayList<Instance>();
 	  featureAlphabet = new Alphabet();
 	  labelAlphabet = new Alphabet();
 	  dfs = HashMultiset.create();
-
 	  for(Instance sourceInstance : sourceInstances1) {
 	    instances.add(new Instance(sourceInstance));
 	  }
@@ -79,12 +73,10 @@ public class Dataset {
    * Create a dataset from three lists of instances
    */
   public Dataset(List<Instance> sourceInstances1, List<Instance> sourceInstances2, List<Instance> sourceInstances3) {
-    
     instances = new ArrayList<Instance>();
     featureAlphabet = new Alphabet();
     labelAlphabet = new Alphabet();
     dfs = HashMultiset.create();
-
     for(Instance sourceInstance : sourceInstances1) {
       instances.add(new Instance(sourceInstance));
     }
@@ -105,22 +97,19 @@ public class Dataset {
 	public void loadCSVFile(String inputFile) throws FileNotFoundException {
     File file = new File(inputFile);
     Scanner scan = new Scanner(file);
-
     while(scan.hasNextLine()) {
       String line = scan.nextLine();
       String[] elements = line.split(","); // e.g. <label>,<feat>:<value>,...
-      
       Instance instance = new Instance();
       instance.setLabel(elements[0]);
-
       // iterate over feature name-value pairs
       for(int i = 1; i < elements.length; i++) {
       	String[] pair = elements[i].split(":");
       	instance.addFeature(pair[0], Float.parseFloat(pair[1]));
       }
-  
       instances.add(instance);
     }
+    scan.close();
 	}
 	
 	/**
@@ -132,22 +121,19 @@ public class Dataset {
 	public void loadMalletFile(String inputFile) throws FileNotFoundException {
     File file = new File(inputFile);
     Scanner scan = new Scanner(file);
-
     while(scan.hasNextLine()) {
       String line = scan.nextLine();
       String[] elements = line.split(" "); 
-      
       Instance instance = new Instance();
       instance.setLabel(elements[elements.length - 1]);
-
       // iterate over feature name-value pairs
       for(int i = 0; i < elements.length - 1; i++) {
       	String[] pair = elements[i].split(":");
       	instance.addFeature(pair[0], Float.parseFloat(pair[1]));
       }
-  
       instances.add(instance);
     }
+    scan.close();
 	}
 	
 	/**
@@ -155,20 +141,16 @@ public class Dataset {
 	 * Specify the source of randomness.
 	 */
 	public List<Instance> popRandom(int n, Random random) {
-
 		Collections.shuffle(instances, random);
 		List<Instance> removedInstances = new ArrayList<Instance>();
-	
 		for(int i = 0; i < n; i++) {
 			if(instances.size() < 1) {
 				System.out.println("pool size too small: " + instances.size());
 				break;
 			}
-
 			Instance removedInstance = instances.remove(0);
 			removedInstances.add(removedInstance);
 		}
-				
 		return removedInstances;
 	}
 	
@@ -176,7 +158,6 @@ public class Dataset {
 	 * Add instances to the @Dataset.
 	 */
 	public void add(List<Instance> sourceInstances) {
-		
 		for(Instance instance : sourceInstances) {
 			instances.add(new Instance(instance));
 		}
@@ -194,11 +175,9 @@ public class Dataset {
 	 * TODO: need to generate doc frequencies here too?
 	 */
 	public void makeAlphabets() {
-		
 		// alphabets may already exist, so create new ones
 		featureAlphabet = new Alphabet();
 		labelAlphabet = new Alphabet();
-		
 		for(Instance instance : instances) {
 			labelAlphabet.add(instance.getLabel());
 			for(String feature : instance.getFeatures().keySet()) {
@@ -213,10 +192,8 @@ public class Dataset {
 	 * are available directly).
 	 */
 	public void makeLabelAlphabet() {
-		
 		// alphabet may already exist, so create a new one
 		labelAlphabet = new Alphabet();
-		
 		for(Instance instance : instances) {
 			labelAlphabet.add(instance.getLabel());
 		}
@@ -256,7 +233,6 @@ public class Dataset {
 	 * a single gold labels for each instance (e.g. for EM algorithm).
 	 */
 	public void setInstanceClassProbabilityDistribution(Set<String> uniqueLabels) {
-	  
 	  for(Instance instance : instances) {
 	    instance.setClassProbabilities(uniqueLabels);
 	  }
@@ -280,12 +256,8 @@ public class Dataset {
 	 * Make sparse vector representations for each instance.
 	 */
 	public void makeVectors() {
-		
 		for(Instance instance : instances) {
-			
-			// vector may already exist
-			instance.resetVector();
-			
+			instance.resetVector(); // in case vector already exists
 			for(int index = Alphabet.startIndex; index < Alphabet.startIndex + featureAlphabet.size(); index++) {
 				String featureName = featureAlphabet.getString(index); 
 				Float featureValue = instance.getFeatureValue(featureName);
@@ -303,14 +275,12 @@ public class Dataset {
    * Alphabets are not affected and may need to be regenerated.
 	 */
 	public void discardFeatures(int min, int max) {
-		
 		// create a document frequency histogram
 		for(Instance instance : instances) {
 			for(String feature : instance.getFeatures().keySet()) {
 				dfs.add(feature);
 			}
 		}
-		
 		// discard low and high-frequency features
 		for(Instance instance : instances) {
 			Iterator<Map.Entry<String, Float>> iterator = instance.getFeatures().entrySet().iterator();
@@ -329,25 +299,19 @@ public class Dataset {
 	 * Specify the source of randomness. 
 	 */
 	public Split[] split(int n) {
-		
 		Split[] splits = new Split[n];
 		int[] foldAssignment = CrossValidation.assignToFolds(instances.size(), n);
-		
 		for(int fold = 0; fold < n; fold++) {
 			List<Instance> trainInstances = new ArrayList<Instance>();
 			List<Instance> testInstances = new ArrayList<Instance>();
-			
 			for(int instanceIndex : CrossValidation.getPoolDocuments(foldAssignment, fold)) {
 				trainInstances.add(instances.get(instanceIndex));
 			}
-			
 			for(int instanceIndex : CrossValidation.getTestDocuments(foldAssignment, fold)) {
 				testInstances.add(instances.get(instanceIndex));
 			}
-			
 			splits[fold] = new Split(trainInstances, testInstances);
 		}
-		
 		return splits;
 	}
 	
@@ -357,13 +321,10 @@ public class Dataset {
 	 * Specify source of randomness.
 	 */
 	public Dataset[] split(int size1, int size2, Random random) {
-	  
 	  List<List<Instance>> twoParts = CrossValidation.split(instances, size1, size2, random);
 	  Dataset[] result = new Dataset[2];
-	  
 	  result[0] = new Dataset(twoParts.get(0));
 	  result[1] = new Dataset(twoParts.get(1));
-	  
 	  return result;
 	}
 	
@@ -372,14 +333,11 @@ public class Dataset {
 	 * Assumes sparse vectors are populated.
 	 */
 	public void writeLibsvmFile(String outputFile) throws IOException {
-
 		BufferedWriter bufferedWriter = getWriter(outputFile);
-		
 		for(Instance instance : instances) {
 			int label = labelAlphabet.getIndex(instance.getLabel());
 			bufferedWriter.write(Integer.toString(label) + " " + instance.getVectorAsString(":", " ") + "\n");
 		}
-		
 		bufferedWriter.close();
 	}
 	
@@ -388,27 +346,22 @@ public class Dataset {
 	 * Populate sparse vectors before running this method.
 	 */
 	public void writeWekaFile(String outputFile) throws IOException {
-		
 		BufferedWriter bufferedWriter = getWriter(outputFile);
 		bufferedWriter.write("@relation mydata\n\n");
-		
 		// write features (attribute)
 		for(String feature : featureAlphabet.getStrings()) {
 			bufferedWriter.write("@attribute " + feature.replaceAll("[^A-Za-z0-9]", "_nonalpha_") + " numeric\n");
 		}
-		
 		// write labels
 		List<String> labels = labelAlphabet.getStrings();
 		Joiner joiner = Joiner.on(",");
 		bufferedWriter.write("@attribute label {" + joiner.join(labels) + "}\n");
-		
 		// write feature vectors
 		bufferedWriter.write("\n@data\n");
 		for(Instance instance : instances) {
 			String label = String.format("%d %s", featureAlphabet.size(), instance.getLabel());
 			bufferedWriter.write("{" + instance.getVectorAsString(" ", ",") + "," + label + "}\n");
 		}
-		
 		bufferedWriter.close();
 	}
 	
@@ -416,7 +369,6 @@ public class Dataset {
 	 * Get buffered writer object for writing to file.
 	 */
 	public static BufferedWriter getWriter(String filePath) {
-		
 		BufferedWriter bufferedWriter = null;
     try {
     	FileWriter fileWriter = new FileWriter(filePath);
@@ -424,7 +376,6 @@ public class Dataset {
     } catch (IOException e) {
 	    e.printStackTrace();
     }
-    
     return bufferedWriter;
 	}
 
@@ -475,7 +426,6 @@ public class Dataset {
 	 * Normalize feature values.
 	 */
 	public void normalize() {
-	  
 	  for(Instance instance: instances) {
 	    instance.normalize();
 	  }
@@ -487,7 +437,6 @@ public class Dataset {
 	 * WARNING: This method modifies the dataset.
 	 */
 	public void hideLabels() {
-	  
 	  for(Instance instance : instances) {
 	    instance.setTemp(instance.getLabel());
 	    instance.setLabel(null);
@@ -500,7 +449,6 @@ public class Dataset {
    * WARNING: This method modifies the dataset.
    */
   public void restoreLabels() {
-    
     for(Instance instance : instances) {
       instance.setLabel(instance.getTemp());
       instance.setTemp(null);
