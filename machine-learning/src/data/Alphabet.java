@@ -7,17 +7,12 @@ import java.util.Map;
 
 /**
  * Map strings to integers and back.
- * TODO: Perhaps "vocabulary" is a better name for this class.
  * 
  * @author dmitriy dligach
- *
  */
 public class Alphabet {
 
-	// start indexing from this value
-	// looks like libsvm is fine with this too
-	public static final int startIndex = 0; 
-	
+	public static final int startIndex = 0; // libsvm ok with this 
 	private Map<String, Integer> str2int;
 	private Map<Integer, String> int2str;
 	private int index;
@@ -29,7 +24,6 @@ public class Alphabet {
 	}
 
 	public void add(String str) {
-		
 		if(! str2int.containsKey(str)) {
 			str2int.put(str, index);
 			int2str.put(index, str);
@@ -37,6 +31,14 @@ public class Alphabet {
 		}
 	}
 
+	public Map<String, Integer> getStringToIntegerMap() {
+	  return str2int;
+	}
+	
+	public Map<Integer, String> getIntegerToStringMap() {
+	  return int2str;
+	}
+	
 	public int size() {
 		return str2int.size();
 	}
@@ -55,11 +57,9 @@ public class Alphabet {
 	public List<String> getStrings() {
 
 		List<String> strings = new ArrayList<String>();
-		
 		for(int i = startIndex; i < size(); i++) {
 			strings.add(int2str.get(i));
 		}
-		
 		return strings;
 	}
 	
