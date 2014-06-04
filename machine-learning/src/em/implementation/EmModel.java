@@ -53,27 +53,26 @@ public class EmModel {
     numWords = dataset.getNumberOfDimensions();
     priors = new double[numClasses];
     theta = new double[numClasses][numWords];
-
     computeTheta(dataset);
     computePriors(dataset);
   }
-  
+    
   /**
    * Calculate p(w|c) for all words in training data 
    * and for each class. Based on equation 13 in the paper.
    */
   private void computeTheta(Dataset dataset) {
-    // precompute total word count in each class
-    double[] totalWordCountInClass = new double[numClasses];
+    double[][] wordCounts = computeWordCounts(dataset);
+    double[] totalWordCountInClass = new double[numClasses];    
     for(int label = 0; label < numClasses; label++) {
-      totalWordCountInClass[label] = getTotalWordCountInClass(dataset, label);
+      for(int word = 0; word < numWords; word++) {
+        totalWordCountInClass[label] += wordCounts[label][word];        
+      }
     }
     // calculcate p(w|c) for each word in each class
     for(int label = 0; label < numClasses; label++) {
       for(int word = 0; word < numWords; word++) {
-        theta[label][word] = 
-            (1 + getWordCountInClass(dataset, word, label)) / // TODO: use cashed word counts instead  
-            (numWords + totalWordCountInClass[label]);
+        theta[label][word] = (1 + wordCounts[label][word]) / (numWords + totalWordCountInClass[label]);
         assert !Double.isNaN(theta[label][word]);
         assert !Double.isInfinite(theta[label][word]);
       }
@@ -81,30 +80,25 @@ public class EmModel {
   }
   
   /**
-   * Compute the sum from the denominator of Equation 13. 
+   * Compute how many times each word occurs in each class.
+   * Values could be fractional since class membership is a probability.  
    */
-  private double getTotalWordCountInClass(Dataset dataset, int classIndex) {
-    double sum = 0;
-    for(int word = 0; word < numWords; word++) {
-      sum += getWordCountInClass(dataset, word, classIndex);
-    }
-    return sum;
-  }
-
-  /**
-   * Compute the sum from the numerator of Equation 13.
-   */
-  private double getWordCountInClass(Dataset dataset, int wordIndex, int classIndex) {
-    double sum = 0;
-    for(Instance instance : dataset.getInstances()) {
-      double lambda = (instance.getLabel() == null ? Constants.lambda : 1.0);
-      String label = labelAlphabet.getString(classIndex);
-      Float wordCount = instance.getDimensionValue(wordIndex); // null if count = 0 for this word
-      if(wordCount != null) {
-        sum += lambda * wordCount * instance.getClassProbability(label); 
+  private double[][] computeWordCounts(Dataset dataset) {
+    double[][] wordCounts = new double[numClasses][numWords];
+    for(int wordIndex = 0; wordIndex < numWords; wordIndex++) {
+      for(int classIndex = 0; classIndex < numClasses; classIndex++) {
+        wordCounts[classIndex][wordIndex] = 0;
+        for(Instance instance : dataset.getInstances()) {
+          double lambda = (instance.getLabel() == null ? Constants.lambda : 1.0);
+          String label = labelAlphabet.getString(classIndex);
+          Float wordCount = instance.getDimensionValue(wordIndex); // null if count = 0 for this word
+          if(wordCount != null) {
+            wordCounts[classIndex][wordIndex] += lambda * wordCount * instance.getClassProbability(label); 
+          }
+        }
       }
     }
-    return sum;
+    return wordCounts;
   }
   
   /**
@@ -120,7 +114,6 @@ public class EmModel {
         numLabeled++;
       }
     }
-    
     for(int classIndex = 0; classIndex < numClasses; classIndex++) {
       double sum = 0;
       for(Instance instance : dataset.getInstances()) {
