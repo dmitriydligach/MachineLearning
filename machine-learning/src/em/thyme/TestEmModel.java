@@ -11,17 +11,15 @@ public class TestEmModel {
   public static void main(String[] args) throws IOException {
 
     Dataset trainSet = new Dataset();
-    trainSet.loadCSVFile("/Users/Dima/Boston/Output/DocTime/doc-time-rel-train.txt");
-    trainSet.makeAlphabets(); // need label alphabet to init NB classifie
-
+    trainSet.loadCSVFile("/Users/Dima/Boston/Data/Thyme/Vectors/DocTimeRel/train.txt");
     Dataset testSet = new Dataset();
-    testSet.loadCSVFile("/Users/Dima/Boston/Output/DocTime/doc-time-rel-test.txt");
-    testSet.makeAlphabets(); // need label alphabet to init NB classifie
+    testSet.loadCSVFile("/Users/Dima/Boston/Data/Thyme/Vectors/DocTimeRel/test.txt");
 
     trainSet.makeAlphabets();
     trainSet.makeVectors();
     testSet.setAlphabets(trainSet.getLabelAlphabet(), trainSet.getFeatureAlphabet());
     testSet.makeVectors();
+    
     trainSet.setInstanceClassProbabilityDistribution(new HashSet<String>(trainSet.getLabelAlphabet().getStrings()));
     EmModel classifier = new EmModel(trainSet.getLabelAlphabet());
     classifier.train(trainSet);
