@@ -8,9 +8,9 @@ import java.util.Random;
 import data.Dataset;
 import em.implementation.EmModel;
 
-public class TestEmAlgorithmWithFixedUnlabeled {
+public class TestEmAlgorithm {
 
-  public static final int STEP = 1000;
+  public static final int STEP = 200;
   public static final int MAXLABELED = 10000;
   public static final int ITERATIONS = 25;
   public static final int RNDSEED = 100;
@@ -34,16 +34,20 @@ public class TestEmAlgorithmWithFixedUnlabeled {
     
     pool.makeAlphabets();
     pool.makeVectors();
+    test.setAlphabets(pool.getLabelAlphabet(), pool.getFeatureAlphabet());
+    test.makeVectors();
     
     Dataset labeled = new Dataset();
     labeled.add(pool.popRandom(numberOfLabeledExamples, new Random(RNDSEED)));
+    labeled.setAlphabets(pool.getLabelAlphabet(), pool.getFeatureAlphabet());
+    labeled.makeVectors();
+
+//    pool.setInstanceClassProbabilityDistribution(new HashSet<String>(pool.getLabelAlphabet().getStrings()));
     labeled.setInstanceClassProbabilityDistribution(new HashSet<String>(pool.getLabelAlphabet().getStrings()));
     
     EmModel classifier = new EmModel(pool.getLabelAlphabet());
-    classifier.train(pool);
-
-    test.setAlphabets(pool.getLabelAlphabet(), pool.getFeatureAlphabet());
-    test.makeVectors();
+//    classifier.train(pool);
+    classifier.train(labeled);
     double accuracy = classifier.test(test);
 
 //  Dataset unlabeled = new Dataset();    
