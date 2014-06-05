@@ -10,7 +10,7 @@ import em.implementation.EmModel;
 
 public class TestEmAlgorithm {
 
-  public static final int STEP = 200;
+  public static final int STEP = 50;
   public static final int MAXLABELED = 10000;
   public static final int ITERATIONS = 25;
   public static final int RNDSEED = 100;
@@ -28,12 +28,12 @@ public class TestEmAlgorithm {
   public static double testEm(int numberOfLabeledExamples, int iterations) throws FileNotFoundException {
     
     Dataset pool = new Dataset();
-    pool.loadCSVFile(TRAINSET);
-    Dataset test = new Dataset();
-    test.loadCSVFile(TESTSET);
-    
+    pool.loadCSVFile(TRAINSET);    
     pool.makeAlphabets();
     pool.makeVectors();
+    
+    Dataset test = new Dataset();
+    test.loadCSVFile(TESTSET);
     test.setAlphabets(pool.getLabelAlphabet(), pool.getFeatureAlphabet());
     test.makeVectors();
     
@@ -42,11 +42,8 @@ public class TestEmAlgorithm {
     labeled.setAlphabets(pool.getLabelAlphabet(), pool.getFeatureAlphabet());
     labeled.makeVectors();
 
-//    pool.setInstanceClassProbabilityDistribution(new HashSet<String>(pool.getLabelAlphabet().getStrings()));
     labeled.setInstanceClassProbabilityDistribution(new HashSet<String>(pool.getLabelAlphabet().getStrings()));
-    
     EmModel classifier = new EmModel(pool.getLabelAlphabet());
-//    classifier.train(pool);
     classifier.train(labeled);
     double accuracy = classifier.test(test);
 
