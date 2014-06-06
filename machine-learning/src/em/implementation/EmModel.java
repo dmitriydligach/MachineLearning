@@ -10,7 +10,6 @@ import utils.Misc;
 import data.Alphabet;
 import data.Dataset;
 import data.Instance;
-import em.eval.Constants;
 
 /**
  * Implements a multinomial naive bayes classifier as described in:
@@ -23,6 +22,9 @@ import em.eval.Constants;
  */
 public class EmModel {
 
+  // weight of unlabeled data
+  public final static double LAMBDA = 1.0;
+  
   // number of classes in training and test data
   protected int numClasses;
   // number of words (features) in training data
@@ -89,7 +91,7 @@ public class EmModel {
       for(int classIndex = 0; classIndex < numClasses; classIndex++) {
         wordCounts[classIndex][wordIndex] = 0;
         for(Instance instance : dataset.getInstances()) {
-          double lambda = (instance.getLabel() == null ? Constants.lambda : 1.0);
+          double lambda = (instance.getLabel() == null ? LAMBDA : 1.0);
           String label = labelAlphabet.getString(classIndex);
           Float wordCount = instance.getDimensionValue(wordIndex); // null if count = 0 for this word
           if(wordCount != null) {
@@ -117,11 +119,11 @@ public class EmModel {
     for(int classIndex = 0; classIndex < numClasses; classIndex++) {
       double sum = 0;
       for(Instance instance : dataset.getInstances()) {
-        double lambda = (instance.getLabel() == null ? Constants.lambda : 1.0);
+        double lambda = (instance.getLabel() == null ? LAMBDA : 1.0);
         String label = labelAlphabet.getString(classIndex);
         sum += lambda * instance.getClassProbability(label);
       }
-      priors[classIndex] = (1 + sum) / (numClasses + numLabeled + Constants.lambda * numUnlabeled);
+      priors[classIndex] = (1 + sum) / (numClasses + numLabeled + LAMBDA * numUnlabeled);
       assert !Double.isNaN(priors[classIndex]);
       assert !Double.isInfinite(priors[classIndex]);
     }

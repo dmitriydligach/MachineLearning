@@ -10,7 +10,6 @@ public class Constants {
   public final static int maxLabeled = 400;
   public final static int step = 5;
   public final static int iterations = 25;
-  public final static double lambda = 1.0;
   public static final int rndSeed = 100;
   
   public final static String[] phenotypes = {"cd", "uc", "ms", "t2d"};
