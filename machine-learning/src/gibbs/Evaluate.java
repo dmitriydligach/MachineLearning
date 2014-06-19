@@ -3,12 +3,12 @@ package gibbs;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
 import semsup.eval.Configuration;
 import semsup.eval.Constants;
+import semsup.eval.Evaluation;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -16,7 +16,6 @@ import com.google.common.io.Files;
 import data.Dataset;
 import data.I2b2Dataset;
 import data.Split;
-import em.implementation.EmModel;
 
 public class Evaluate {
 
@@ -41,7 +40,7 @@ public class Evaluate {
       for(Configuration configuration : configurations) {
         double accuracy = 0.0;
         if(configuration.numUnlabeled == 0) {
-          accuracy = evaluateBaseline(configuration);
+          accuracy = Evaluation.evaluateBaseline(configuration, normalize);
         } else {
           accuracy = evaluateSampler(configuration);
         }
@@ -99,49 +98,4 @@ public class Evaluate {
 
     return cumulativeAccuracy / Constants.folds;    
   }
-  
-  /**
-   * Use labeled data only.
-   */
-  public static double evaluateBaseline(Configuration configuration) throws FileNotFoundException {
-
-    I2b2Dataset dataset = new I2b2Dataset();
-    dataset.loadCSVFile(configuration.dataPath, configuration.labelPath);
-    
-    if(normalize) {
-      dataset.normalize();
-    }
-    if(configuration.sourceLabels != null) {
-      dataset.mapLabels(configuration.sourceLabels, configuration.targetLabel);
-    }
-    
-    // make alphabets now, after labels were potentially remapped 
-    dataset.makeAlphabets();
-
-    Split[] splits = dataset.split(Constants.folds);
-    double cumulativeAccuracy = 0;
-
-    for(int fold = 0; fold < Constants.folds; fold++) {
-      Dataset labeled = new Dataset();
-      Dataset nontest = splits[fold].getPoolSet();
-      Dataset test = splits[fold].getTestSet();
-
-      labeled.add(nontest.popRandom(configuration.numLabeled, new Random(100)));
-
-      labeled.setInstanceClassProbabilityDistribution(new HashSet<String>(dataset.getLabelAlphabet().getStrings()));
-      labeled.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
-      labeled.makeVectors();
-      
-      EmModel classifier = new EmModel(dataset.getLabelAlphabet());
-      classifier.train(labeled);
- 
-      test.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
-      test.makeVectors();
-      double accuracy = classifier.test(test);
-
-      cumulativeAccuracy += accuracy;
-    }
-
-    return cumulativeAccuracy / Constants.folds;    
-  }  
 }
