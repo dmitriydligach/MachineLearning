@@ -21,7 +21,6 @@ import em.implementation.EmAlgorithm;
 public class EvaluatePhenotype extends Thread {
 
   public String phenotype;
-  public final boolean normalize = false;
 
   public EvaluatePhenotype(String phenotype) {
     this.phenotype = phenotype;
@@ -29,7 +28,7 @@ public class EvaluatePhenotype extends Thread {
 
   public void run() {
 
-    File file = new File(Constants.outputDir + phenotype + (normalize ? "-normalized" : "") + ".txt");
+    File file = new File(Constants.outputDir + phenotype + ".txt");
     if(file.exists()) {
       System.out.println(file.getName() + " already exists... deleting...");
       file.delete();
@@ -45,7 +44,7 @@ public class EvaluatePhenotype extends Thread {
       for(Configuration configuration : configurations) {
         double accuracy;
         if(configuration.numUnlabeled == 0) {
-          accuracy = Evaluation.evaluateBaseline(configuration, normalize);
+          accuracy = Evaluation.evaluateBaseline(configuration);
         } else {
           accuracy = evaluate(configuration);
         }
@@ -74,16 +73,10 @@ public class EvaluatePhenotype extends Thread {
     } catch (FileNotFoundException e) {
       System.err.println("data file not found!");
     }
-
-    if(normalize) {
-      dataset.normalize();
-      unlabeled.normalize();
-    }
     if(configuration.sourceLabels != null) {
       // no need to remap unlabeled since there are no labels
       dataset.mapLabels(configuration.sourceLabels, configuration.targetLabel);
     }
-
     // make alphabets now, after labels were potentially remapped 
     dataset.makeAlphabets();
 

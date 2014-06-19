@@ -20,11 +20,10 @@ import data.Split;
 public class Evaluate {
 
   public static final String phenotype = "t2d";
-  public static final boolean normalize = false;
   
   public static void main(String[] args) throws IOException {
     
-    File file = new File(Constants.outputDir + phenotype + (normalize ? "-normalized" : "") + ".txt");
+    File file = new File(Constants.outputDir + phenotype + ".txt");
     if(file.exists()) {
       System.out.println(file.getName() + " already exists... deleting...");
       file.delete();
@@ -40,7 +39,7 @@ public class Evaluate {
       for(Configuration configuration : configurations) {
         double accuracy = 0.0;
         if(configuration.numUnlabeled == 0) {
-          accuracy = Evaluation.evaluateBaseline(configuration, normalize);
+          accuracy = Evaluation.evaluateBaseline(configuration);
         } else {
           accuracy = evaluateSampler(configuration);
         }
@@ -60,20 +59,13 @@ public class Evaluate {
     // load labeled data
     I2b2Dataset dataset = new I2b2Dataset();
     dataset.loadCSVFile(configuration.dataPath, configuration.labelPath);
-
     // load unlabeled data
     I2b2Dataset unlabeled = new I2b2Dataset();
     unlabeled.loadFromCSVFile(configuration.dataPath, configuration.labelPath, configuration.numUnlabeled);
-    
-    if(normalize) {
-      dataset.normalize();
-      unlabeled.normalize();
-    }
     if(configuration.sourceLabels != null) {
       // no need to remap unlabeled since there are no labels
       dataset.mapLabels(configuration.sourceLabels, configuration.targetLabel);
     }
-    
     // make alphabets now, after labels were potentially remapped 
     dataset.makeAlphabets();
 

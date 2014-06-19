@@ -14,7 +14,7 @@ public class Evaluation {
   /**
    * Use labeled data only.
    */
-  public static double evaluateBaseline(Configuration configuration, boolean normalize) {
+  public static double evaluateBaseline(Configuration configuration) {
 
     I2b2Dataset dataset = new I2b2Dataset();
     try {
@@ -22,14 +22,9 @@ public class Evaluation {
     } catch (FileNotFoundException e) {
       System.err.println("could not load data: " + configuration.dataPath);
     }
-    
-    if(normalize) {
-      dataset.normalize();
-    }
     if(configuration.sourceLabels != null) {
       dataset.mapLabels(configuration.sourceLabels, configuration.targetLabel);
     }
-    
     // make alphabets now, after labels were potentially remapped 
     dataset.makeAlphabets();
 
