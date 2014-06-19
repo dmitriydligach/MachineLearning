@@ -8,6 +8,7 @@ import java.util.Random;
 
 import semsup.eval.Configuration;
 import semsup.eval.Constants;
+import semsup.eval.Evaluation;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -42,7 +43,12 @@ public class EvaluatePhenotype extends Thread {
       output.append(String.format("%-3d ", labeled));
 
       for(Configuration configuration : configurations) {
-        double accuracy = evaluate(configuration);
+        double accuracy;
+        if(configuration.numUnlabeled == 0) {
+          accuracy = Evaluation.evaluateBaseline(configuration, normalize);
+        } else {
+          accuracy = evaluate(configuration);
+        }
         output.append(String.format("%.4f ", accuracy));
       }
 

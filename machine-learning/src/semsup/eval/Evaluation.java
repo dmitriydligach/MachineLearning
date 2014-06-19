@@ -14,11 +14,14 @@ public class Evaluation {
   /**
    * Use labeled data only.
    */
-  public static double evaluateBaseline(Configuration configuration, boolean normalize) 
-      throws FileNotFoundException {
+  public static double evaluateBaseline(Configuration configuration, boolean normalize) {
 
     I2b2Dataset dataset = new I2b2Dataset();
-    dataset.loadCSVFile(configuration.dataPath, configuration.labelPath);
+    try {
+      dataset.loadCSVFile(configuration.dataPath, configuration.labelPath);
+    } catch (FileNotFoundException e) {
+      System.err.println("could not load data: " + configuration.dataPath);
+    }
     
     if(normalize) {
       dataset.normalize();
