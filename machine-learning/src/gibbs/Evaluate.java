@@ -7,14 +7,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
+import semsup.eval.Configuration;
+import semsup.eval.Constants;
+
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
 import data.Dataset;
 import data.I2b2Dataset;
 import data.Split;
-import em.eval.Configuration;
-import em.eval.Constants;
 import em.implementation.EmModel;
 
 public class Evaluate {

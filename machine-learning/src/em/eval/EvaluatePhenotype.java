@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
+import semsup.eval.Configuration;
+import semsup.eval.Constants;
+
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
