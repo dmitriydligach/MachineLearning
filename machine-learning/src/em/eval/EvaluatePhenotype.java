@@ -3,7 +3,9 @@ package em.eval;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import semsup.eval.Configuration;
@@ -90,13 +92,17 @@ public class EvaluatePhenotype extends Thread {
       Dataset test = splits[fold].getTestSet();
 
       labeled.add(nontest.popRandom(configuration.numLabeled, new Random(Constants.rndSeed)));
+      
+      double lambda = findBestLambda(labeled, unlabeled, dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
+      
       double accuracy = EmAlgorithm.runAndEvaluate(
           labeled, 
           unlabeled,
           test, 
           dataset.getLabelAlphabet(), 
           dataset.getFeatureAlphabet(),
-          configuration.numIterations);
+          configuration.numIterations,
+          lambda);
       cumulativeAccuracy = cumulativeAccuracy + accuracy;
     }
 
@@ -106,36 +112,47 @@ public class EvaluatePhenotype extends Thread {
   /**
    * Search for best parameters using labeled training data.
    */
-  public void tune(Dataset labeled, Dataset unlabeled, Alphabet labelAlphabet, Alphabet featureAlphabet) {
+  public double findBestLambda(Dataset labeled, Dataset unlabeled, Alphabet labelAlphabet, Alphabet featureAlphabet) {
+    
+    double[] lambdas = {0.0, 0.25, 0.5};
+    
+    double bestLambda = -1.0;
+    double bestAccuracy = -1.0;
+    for(double lambda : lambdas) {
+      double accuracy = evaluateLambda(labeled, unlabeled, labelAlphabet, featureAlphabet, lambda);
+      if(accuracy > bestAccuracy) {
+        bestAccuracy = accuracy;
+        bestLambda = lambda;
+      }
+    }
+    
+    System.out.println("best lambda = " + bestLambda + ", best accuracy = " + bestAccuracy);
+    return bestLambda;
+  }
+  
+  /**
+   * Evaluate a specific value of lambda using n-fold CV.
+   */
+  public double evaluateLambda(Dataset labeled, Dataset unlabeled, Alphabet labelAlphabet, Alphabet featureAlphabet, double lambda) {
     
     final int folds = 2;
     final int iterations = 10;
     
     Split[] splits = labeled.split(folds);
-
-    double cumulativeDevImprovement = 0;
-    for(int fold = 0; fold < folds; fold++) {
-      
-      double baselineAccuracy = EmAlgorithm.runAndEvaluate(
-          splits[fold].getPoolSet(), 
-          new Dataset(),
-          splits[fold].getTestSet(), 
-          labelAlphabet, 
-          featureAlphabet,
-          0);
-      
-      double semSupAccuracy = EmAlgorithm.runAndEvaluate(
+    double cumulativeAccuracy = 0;
+    
+    for(int fold = 0; fold < folds; fold++) {      
+      double accuracy = EmAlgorithm.runAndEvaluate(
           splits[fold].getPoolSet(), 
           unlabeled,
           splits[fold].getTestSet(), 
           labelAlphabet,
           featureAlphabet,
-          iterations);
-      
-      double improvement = semSupAccuracy - baselineAccuracy;
-      cumulativeDevImprovement = cumulativeDevImprovement + improvement;
+          iterations,
+          lambda);
+      cumulativeAccuracy = cumulativeAccuracy + accuracy;
     }
    
-    double averageDevImprovement = cumulativeDevImprovement / folds;
+    return cumulativeAccuracy / folds;
   }
 }
