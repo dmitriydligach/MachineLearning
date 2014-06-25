@@ -23,8 +23,7 @@ import data.Instance;
 public class EmModel {
 
   // weight of unlabeled data
-  public final static double LAMBDA = 1.0;
-  
+  protected double weight;
   // number of classes in training and test data
   protected int numClasses;
   // number of words (features) in training data
@@ -41,8 +40,9 @@ public class EmModel {
    * using the dataset's alphabet because sometimes the training data
    * may not have all the labels that exist in the test data.
    */
-	public EmModel(Alphabet labelAlphabet) {
+	public EmModel(Alphabet labelAlphabet, double weight) {
 	  this.labelAlphabet = labelAlphabet;
+	  this.weight = weight;
 	}
 	
   /**
@@ -91,7 +91,7 @@ public class EmModel {
       for(int classIndex = 0; classIndex < numClasses; classIndex++) {
         wordCounts[classIndex][wordIndex] = 0;
         for(Instance instance : dataset.getInstances()) {
-          double lambda = (instance.getLabel() == null ? LAMBDA : 1.0);
+          double lambda = (instance.getLabel() == null ? weight : 1.0);
           String label = labelAlphabet.getString(classIndex);
           Float wordCount = instance.getDimensionValue(wordIndex); // null if count = 0 for this word
           if(wordCount != null) {
@@ -119,11 +119,11 @@ public class EmModel {
     for(int classIndex = 0; classIndex < numClasses; classIndex++) {
       double sum = 0;
       for(Instance instance : dataset.getInstances()) {
-        double lambda = (instance.getLabel() == null ? LAMBDA : 1.0);
+        double lambda = (instance.getLabel() == null ? weight : 1.0);
         String label = labelAlphabet.getString(classIndex);
         sum += lambda * instance.getClassProbability(label);
       }
-      priors[classIndex] = (1 + sum) / (numClasses + numLabeled + LAMBDA * numUnlabeled);
+      priors[classIndex] = (1 + sum) / (numClasses + numLabeled + weight * numUnlabeled);
       assert !Double.isNaN(priors[classIndex]);
       assert !Double.isInfinite(priors[classIndex]);
     }
