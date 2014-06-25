@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Random;
 
+import semsup.eval.Constants;
 import data.Dataset;
 import em.implementation.EmAlgorithm;
 
@@ -46,7 +47,8 @@ public class TestEmAlgorithm {
         test, 
         pool.getLabelAlphabet(), 
         pool.getFeatureAlphabet(),
-        iterations);
+        iterations,
+        Constants.defaultLambda);
 
     return accuracy;
   }

@@ -3,6 +3,7 @@ package em.thyme;
 import java.io.IOException;
 import java.util.HashSet;
 
+import semsup.eval.Constants;
 import data.Dataset;
 import em.implementation.EmModel;
 
@@ -21,7 +22,7 @@ public class TestEmModel {
     testSet.makeVectors();
     
     trainSet.setInstanceClassProbabilityDistribution(new HashSet<String>(trainSet.getLabelAlphabet().getStrings()));
-    EmModel classifier = new EmModel(trainSet.getLabelAlphabet());
+    EmModel classifier = new EmModel(trainSet.getLabelAlphabet(), Constants.defaultLambda);
     classifier.train(trainSet);
     double accuracy = classifier.test(testSet);
 

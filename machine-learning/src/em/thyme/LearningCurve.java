@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Random;
 
+import semsup.eval.Constants;
 import data.Dataset;
 import em.implementation.EmModel;
 
@@ -41,7 +42,7 @@ public class LearningCurve {
     labeled.makeVectors();
 
     labeled.setInstanceClassProbabilityDistribution(new HashSet<String>(pool.getLabelAlphabet().getStrings()));
-    EmModel classifier = new EmModel(pool.getLabelAlphabet());
+    EmModel classifier = new EmModel(pool.getLabelAlphabet(), Constants.defaultLambda);
     classifier.train(labeled);
     double accuracy = classifier.test(test);
     
