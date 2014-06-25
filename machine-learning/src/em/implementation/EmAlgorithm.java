@@ -13,13 +13,14 @@ public class EmAlgorithm {
                           Dataset test, 
                           Alphabet labelAlphabet, 
                           Alphabet featureAlphabet,
-                          int iterations) {
+                          int iterations,
+                          double lambda) {
     
     labeled.setInstanceClassProbabilityDistribution(new HashSet<String>(labelAlphabet.getStrings()));
     labeled.setAlphabets(labelAlphabet, featureAlphabet);
     labeled.makeVectors();
 
-    EmModel em = new EmModel(labelAlphabet);
+    EmModel em = new EmModel(labelAlphabet, lambda);
     em.train(labeled);
     
     for(int iteration = 0; iteration < iterations; iteration++) {
