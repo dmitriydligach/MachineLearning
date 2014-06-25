@@ -46,7 +46,8 @@ public class TestEmAlgorithmWithFixedUnlabeled {
           test, 
           dataset.getLabelAlphabet(), 
           dataset.getFeatureAlphabet(),
-          iterations);
+          iterations,
+          1.0);
       cumulativeAccuracy = cumulativeAccuracy + accuracy;
     }
 

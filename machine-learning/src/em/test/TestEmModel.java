@@ -30,7 +30,7 @@ public class TestEmModel {
 			testSet.makeVectors();
 
 			trainSet.setInstanceClassProbabilityDistribution(new HashSet<String>(dataset.getLabelAlphabet().getStrings()));
-			EmModel classifier = new EmModel(dataset.getLabelAlphabet());
+			EmModel classifier = new EmModel(dataset.getLabelAlphabet(), 1.0);
 			
 			classifier.train(trainSet);
 			double accuracy = classifier.test(testSet);
