@@ -44,7 +44,7 @@ public class EvaluateViability extends Thread {
       for(Configuration configuration : configurations) {
         double accuracy;
         if(configuration.numUnlabeled == 0) {
-          accuracy = Evaluation.evaluateBaseline(configuration);
+          accuracy = 0;
         } else {
           accuracy = evaluate(configuration);
         }
@@ -64,6 +64,8 @@ public class EvaluateViability extends Thread {
    * Evaluate a configuration. Return n-fold CV accuracy.
    */
   public double evaluate(Configuration configuration) {
+    
+    final int devFolds = 2;
 
     I2b2Dataset dataset = new I2b2Dataset();
     I2b2Dataset unlabeled = new I2b2Dataset();
@@ -81,17 +83,18 @@ public class EvaluateViability extends Thread {
     dataset.makeAlphabets();
 
     Split[] splits = dataset.split(Constants.folds);
+
     double cumulativeImprovement = 0;
-    
     for(int fold = 0; fold < Constants.folds; fold++) {
+    
       Dataset labeled = new Dataset();
       Dataset nontest = splits[fold].getPoolSet();
       labeled.add(nontest.popRandom(configuration.numLabeled, new Random(Constants.rndSeed)));
 
-      Split[] devSplits = labeled.split(2);
+      Split[] devSplits = labeled.split(devFolds);
+
       double cumulativeDevImprovement = 0;
-      
-      for(int devFold = 0; devFold < 2; devFold++) {
+      for(int devFold = 0; devFold < devFolds; devFold++) {
         
         double baselineAccuracy = EmAlgorithm.runAndEvaluate(
             devSplits[devFold].getPoolSet(), 
@@ -107,13 +110,13 @@ public class EvaluateViability extends Thread {
             devSplits[devFold].getTestSet(), 
             dataset.getLabelAlphabet(), 
             dataset.getFeatureAlphabet(),
-            configuration.numIterations);
+            10);
         
         double improvement = semSupAccuracy - baselineAccuracy;
         cumulativeDevImprovement = cumulativeDevImprovement + improvement;
       }
-      
-      double averageDevImprovement = cumulativeDevImprovement / 2;
+     
+      double averageDevImprovement = cumulativeDevImprovement / devFolds;
       cumulativeImprovement = cumulativeImprovement + averageDevImprovement;
     }
 
