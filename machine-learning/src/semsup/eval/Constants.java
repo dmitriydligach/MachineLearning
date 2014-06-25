@@ -11,7 +11,8 @@ public class Constants {
   public final static int step = 5;
   public final static int iterations = 25;
   public static final int rndSeed = 100;
-  
+  public final static double defaultLambda = 1.0;
+   
   public final static String[] phenotypes = {"cd", "uc", "ms", "t2d"};
   public final static int[] unlabeledSizes = {500, 1000, 3000, 5000};
 	

@@ -42,7 +42,7 @@ public class Evaluation {
       labeled.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
       labeled.makeVectors();
       
-      EmModel classifier = new EmModel(dataset.getLabelAlphabet());
+      EmModel classifier = new EmModel(dataset.getLabelAlphabet(), Constants.defaultLambda);
       classifier.train(labeled);
  
       test.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
