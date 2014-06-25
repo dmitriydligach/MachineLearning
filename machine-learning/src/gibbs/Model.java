@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.HashSet;
 
+import semsup.eval.Constants;
 import cc.mallet.types.Dirichlet;
 import data.Alphabet;
 import data.Dataset;
@@ -87,7 +88,7 @@ public class Model {
     labeled.setAlphabets(labelAlphabet, featureAlphabet);
     labeled.makeVectors();
 
-    EmModel classifier = new EmModel(labelAlphabet);
+    EmModel classifier = new EmModel(labelAlphabet, Constants.defaultLambda);
     classifier.train(labeled);
     
     unlabeled.setAlphabets(labelAlphabet, featureAlphabet);

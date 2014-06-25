@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Random;
 
+import semsup.eval.Constants;
 import data.Dataset;
 import data.I2b2Dataset;
 import data.Split;
@@ -83,7 +84,7 @@ public class GibbsVsBaseline {
       labeled.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
       labeled.makeVectors();
 
-      EmModel classifier = new EmModel(dataset.getLabelAlphabet());
+      EmModel classifier = new EmModel(dataset.getLabelAlphabet(), Constants.defaultLambda);
       classifier.train(labeled);
 
       test.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
