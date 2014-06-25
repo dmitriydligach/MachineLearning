@@ -8,11 +8,11 @@ import java.util.Random;
 
 import semsup.eval.Configuration;
 import semsup.eval.Constants;
-import semsup.eval.Evaluation;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
+import data.Alphabet;
 import data.Dataset;
 import data.I2b2Dataset;
 import data.Split;
@@ -102,7 +102,8 @@ public class EvaluateViability extends Thread {
             devSplits[devFold].getTestSet(), 
             dataset.getLabelAlphabet(), 
             dataset.getFeatureAlphabet(),
-            0);
+            0,
+            Constants.defaultLambda);
         
         double semSupAccuracy = EmAlgorithm.runAndEvaluate(
             devSplits[devFold].getPoolSet(), 
@@ -110,7 +111,8 @@ public class EvaluateViability extends Thread {
             devSplits[devFold].getTestSet(), 
             dataset.getLabelAlphabet(), 
             dataset.getFeatureAlphabet(),
-            10);
+            10,
+            Constants.defaultLambda);
         
         double improvement = semSupAccuracy - baselineAccuracy;
         cumulativeDevImprovement = cumulativeDevImprovement + improvement;
@@ -121,5 +123,43 @@ public class EvaluateViability extends Thread {
     }
 
     return cumulativeImprovement / Constants.folds;
+  }
+  
+  /**
+   * Search for best parameters using labeled training data.
+   */
+  public void tune(Dataset labeled, Dataset unlabeled, Alphabet labelAlphabet, Alphabet featureAlphabet) {
+    
+    final int folds = 2;
+    final int iterations = 10;
+    
+    Split[] splits = labeled.split(folds);
+
+    double cumulativeDevImprovement = 0;
+    for(int fold = 0; fold < folds; fold++) {
+      
+      double baselineAccuracy = EmAlgorithm.runAndEvaluate(
+          splits[fold].getPoolSet(), 
+          new Dataset(),
+          splits[fold].getTestSet(), 
+          labelAlphabet, 
+          featureAlphabet,
+          0,
+          Constants.defaultLambda);
+      
+      double semSupAccuracy = EmAlgorithm.runAndEvaluate(
+          splits[fold].getPoolSet(), 
+          unlabeled,
+          splits[fold].getTestSet(), 
+          labelAlphabet,
+          featureAlphabet,
+          iterations,
+          Constants.defaultLambda);
+      
+      double improvement = semSupAccuracy - baselineAccuracy;
+      cumulativeDevImprovement = cumulativeDevImprovement + improvement;
+    }
+   
+    double averageDevImprovement = cumulativeDevImprovement / folds;
   }
 }
