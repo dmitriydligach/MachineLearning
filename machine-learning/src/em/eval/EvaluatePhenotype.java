@@ -3,9 +3,7 @@ package em.eval;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import semsup.eval.Configuration;
@@ -90,11 +88,8 @@ public class EvaluatePhenotype extends Thread {
       Dataset labeled = new Dataset();
       Dataset nontest = splits[fold].getPoolSet();
       Dataset test = splits[fold].getTestSet();
-
       labeled.add(nontest.popRandom(configuration.numLabeled, new Random(Constants.rndSeed)));
-      
       double lambda = findBestLambda(labeled, unlabeled, dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
-      
       double accuracy = EmAlgorithm.runAndEvaluate(
           labeled, 
           unlabeled,
@@ -110,14 +105,14 @@ public class EvaluatePhenotype extends Thread {
   }
   
   /**
-   * Search for best parameters using labeled training data.
+   * Search for best lambda using labeled training data.
    */
   public double findBestLambda(Dataset labeled, Dataset unlabeled, Alphabet labelAlphabet, Alphabet featureAlphabet) {
     
     double[] lambdas = {0.0, 0.25, 0.5};
     
-    double bestLambda = -1.0;
-    double bestAccuracy = -1.0;
+    double bestLambda = 1;
+    double bestAccuracy = -1;
     for(double lambda : lambdas) {
       double accuracy = evaluateLambda(labeled, unlabeled, labelAlphabet, featureAlphabet, lambda);
       if(accuracy > bestAccuracy) {
@@ -126,7 +121,6 @@ public class EvaluatePhenotype extends Thread {
       }
     }
     
-    System.out.println("best lambda = " + bestLambda + ", best accuracy = " + bestAccuracy);
     return bestLambda;
   }
   
@@ -135,8 +129,8 @@ public class EvaluatePhenotype extends Thread {
    */
   public double evaluateLambda(Dataset labeled, Dataset unlabeled, Alphabet labelAlphabet, Alphabet featureAlphabet, double lambda) {
     
-    final int folds = 2;
-    final int iterations = 10;
+    final int folds = 5;
+    final int iterations = 15;
     
     Split[] splits = labeled.split(folds);
     double cumulativeAccuracy = 0;
