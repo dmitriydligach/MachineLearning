@@ -1,36 +1,78 @@
 package semsup.eval;
 
+import java.io.FileInputStream;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 public class Constants {
   
-  public final static int folds = 10;
-  public final static int maxLabeled = 400;
-  public final static int step = 5;
-  public final static int iterations = 25;
-  public static final int rndSeed = 100;
-  public final static double defaultLambda = 1.0;
+  public final static String definitions = "/Users/Dima/Boston/Temp/constants.txt";
+  
+  public static int folds;
+  public static int maxLabeled;
+  public static int step;
+  public static int iterations;
+  public static int rndSeed;
+  public static double defaultLambda;
    
-  public final static String[] phenotypes = {"cd", "uc", "ms", "t2d"};
-  public final static int[] unlabeledSizes = {500, 1000, 3000, 5000};
+  public static List<String> phenotypes = new LinkedList<String>();
+  public static List<Integer> unlabeledSizes = new LinkedList<Integer>();
 	
-  public static final String cdData = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt";
-	public static final String cdLabels = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-cd.txt";
+  public static String cdData;
+	public static String cdLabels;
+	public static String ucData;
+  public static String ucLabels;
+  public static String msData;
+  public static String msLabels;
+  public static String t2dData;
+  public static String t2dLabels;
+  
+  public static Set<String> msSourceLabels = new HashSet<String>(Arrays.asList("2", "3", "4", "5"));
+  public static String msTargetLabel = "2";
+  public static Set<String> t2dSourceLabels = new HashSet<String>(Arrays.asList("\"possible\""));
+  public static String t2dTargetLabel = "\"no\"";
+  
+	public static String outputDir;
 	
-	public static final String ucData = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt";
-  public static final String ucLabels = "/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-uc.txt";
-  
-  public static final String msData = "/Users/Dima/Boston/Data/Phenotype/MS/Data/data.txt";
-  public static final String msLabels = "/Users/Dima/Boston/Data/Phenotype/MS/Data/labels.txt";
-  public static final Set<String> msSourceLabels = new HashSet<String>(Arrays.asList("2", "3", "4", "5"));
-  public static final String msTargetLabel = "2";
-  
-  public static final String t2dData = "/Users/Dima/Boston/Data/Phenotype/T2D/Data/data.txt";
-  public static final String t2dLabels = "/Users/Dima/Boston/Data/Phenotype/T2D/Data/labels.txt";
-  public static final Set<String> t2dSourceLabels = new HashSet<String>(Arrays.asList("\"possible\""));
-  public static final String t2dTargetLabel = "\"no\"";
-  
-	public static final String outputDir = "/Users/Dima/Boston/Out/";
+	/**
+	 * Read constants from a properties file.
+	 */
+	public static void populate(String file) {
+	  
+    Properties properties = new Properties();
+    try {
+      properties.load(new FileInputStream(definitions));
+    } catch (Exception e) {
+      System.err.println("couldn't open properties file: " + definitions);
+    }
+
+    folds = Integer.parseInt((String) properties.get("folds"));
+    maxLabeled = Integer.parseInt((String) properties.get("maxLabeled"));
+    step = Integer.parseInt((String) properties.get("step"));
+    iterations = Integer.parseInt((String) properties.get("iterations"));
+    rndSeed = Integer.parseInt((String) properties.get("rndSeed"));
+    defaultLambda = Double.parseDouble((String) properties.get("defaultLambda"));
+    
+    for(String phenotype : ((String) properties.get("phenotypes")).split(",")) {
+      phenotypes.add(phenotype);  
+    }
+    for(String unlabeledSize : ((String) properties.get("unlabeledSizes")).split(",")) {
+      unlabeledSizes.add(Integer.parseInt(unlabeledSize));
+    }
+    
+    cdData = (String) properties.get("cdData");
+    cdLabels = (String) properties.get("cdLabels");
+    ucData = (String) properties.get("ucData");
+    ucLabels = (String) properties.get("ucLabels");
+    msData = (String) properties.get("msData");
+    msLabels = (String) properties.get("msLabels");
+    t2dData = (String) properties.get("t2dData");
+    t2dLabels = (String) properties.get("t2dLabels");
+    
+    outputDir = (String) properties.get("outputDir");
+	}
 }
