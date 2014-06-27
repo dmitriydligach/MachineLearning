@@ -1,0 +1,25 @@
+# em parameters
+
+folds=10
+maxLabeled=400
+step=5
+iterations=25
+rndSeed=100
+defaultLambda=1.0
+
+devFolds=5
+devIterations=15
+
+phenotypes=cd,uc,ms,t2d
+unlabeledSizes=500,1000,3000,5000
+
+cdData=/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt
+cdLabels=/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-cd.txt
+ucData=/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt
+ucLabels=/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-uc.txt
+msData=/Users/Dima/Boston/Data/Phenotype/MS/Data/data.txt
+msLabels=/Users/Dima/Boston/Data/Phenotype/MS/Data/labels.txt
+t2dData=/Users/Dima/Boston/Data/Phenotype/T2D/Data/data.txt
+t2dLabels=/Users/Dima/Boston/Data/Phenotype/T2D/Data/labels.txt
+
+outputDir=/Users/Dima/Boston/Out/
