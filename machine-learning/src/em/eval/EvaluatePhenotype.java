@@ -129,24 +129,21 @@ public class EvaluatePhenotype extends Thread {
    */
   public double evaluateLambda(Dataset labeled, Dataset unlabeled, Alphabet labelAlphabet, Alphabet featureAlphabet, double lambda) {
     
-    final int folds = 5;
-    final int iterations = 15;
-    
-    Split[] splits = labeled.split(folds);
+    Split[] splits = labeled.split(Constants.devFolds);
     double cumulativeAccuracy = 0;
     
-    for(int fold = 0; fold < folds; fold++) {      
+    for(int fold = 0; fold < Constants.devFolds; fold++) {      
       double accuracy = EmAlgorithm.runAndEvaluate(
           splits[fold].getPoolSet(), 
           unlabeled,
           splits[fold].getTestSet(), 
           labelAlphabet,
           featureAlphabet,
-          iterations,
+          Constants.devIterations,
           lambda);
       cumulativeAccuracy = cumulativeAccuracy + accuracy;
     }
    
-    return cumulativeAccuracy / folds;
+    return cumulativeAccuracy / Constants.devFolds;
   }
 }

@@ -18,6 +18,9 @@ public class Constants {
   public static int iterations;
   public static int rndSeed;
   public static double defaultLambda;
+  
+  public static int devFolds;
+  public static int devIterations;
    
   public static List<String> phenotypes = new LinkedList<String>();
   public static List<Integer> unlabeledSizes = new LinkedList<Integer>();
@@ -56,6 +59,9 @@ public class Constants {
     iterations = Integer.parseInt((String) properties.get("iterations"));
     rndSeed = Integer.parseInt((String) properties.get("rndSeed"));
     defaultLambda = Double.parseDouble((String) properties.get("defaultLambda"));
+    
+    devFolds = Integer.parseInt((String) properties.get("devFolds"));
+    devIterations = Integer.parseInt((String) properties.get("devIterations"));
     
     for(String phenotype : ((String) properties.get("phenotypes")).split(",")) {
       phenotypes.add(phenotype);  
