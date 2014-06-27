@@ -10,17 +10,14 @@ import java.util.Set;
 
 public class Constants {
   
-  public final static String definitions = "/Users/Dima/Boston/Temp/constants.txt";
-  
   public static int folds;
+  public static int devFolds;
   public static int maxLabeled;
   public static int step;
   public static int iterations;
+  public static int devIterations;
   public static int rndSeed;
   public static double defaultLambda;
-  
-  public static int devFolds;
-  public static int devIterations;
    
   public static List<String> phenotypes = new LinkedList<String>();
   public static List<Integer> unlabeledSizes = new LinkedList<Integer>();
@@ -44,24 +41,23 @@ public class Constants {
 	/**
 	 * Read constants from a properties file.
 	 */
-	public static void populate(String file) {
+	public static void populate(String propertiesFile) {
 	  
     Properties properties = new Properties();
     try {
-      properties.load(new FileInputStream(definitions));
+      properties.load(new FileInputStream(propertiesFile));
     } catch (Exception e) {
-      System.err.println("couldn't open properties file: " + definitions);
+      System.err.println("couldn't open properties file: " + propertiesFile);
     }
-
+    
     folds = Integer.parseInt((String) properties.get("folds"));
+    devFolds = Integer.parseInt((String) properties.get("devFolds"));
     maxLabeled = Integer.parseInt((String) properties.get("maxLabeled"));
     step = Integer.parseInt((String) properties.get("step"));
     iterations = Integer.parseInt((String) properties.get("iterations"));
+    devIterations = Integer.parseInt((String) properties.get("devIterations"));
     rndSeed = Integer.parseInt((String) properties.get("rndSeed"));
     defaultLambda = Double.parseDouble((String) properties.get("defaultLambda"));
-    
-    devFolds = Integer.parseInt((String) properties.get("devFolds"));
-    devIterations = Integer.parseInt((String) properties.get("devIterations"));
     
     for(String phenotype : ((String) properties.get("phenotypes")).split(",")) {
       phenotypes.add(phenotype);  
@@ -80,5 +76,20 @@ public class Constants {
     t2dLabels = (String) properties.get("t2dLabels");
     
     outputDir = (String) properties.get("outputDir");
+    print();
+	}
+	
+	/**
+	 * Print certain constants.
+	 */
+	public static void print() {
+	  
+	  System.out.format("%20s %d\n", "folds", folds);
+	  System.out.format("%20s %d\n", "dev folds", devFolds);
+	  System.out.format("%20s %d\n", "step", step);
+	  System.out.format("%20s %d\n", "iterations", iterations);
+	  System.out.format("%20s %d\n", "dev iterations", devIterations);
+	  System.out.format("%20s %s\n", "phenotypes", phenotypes);
+	  System.out.format("%20s %s\n", "unlabeled sizes", unlabeledSizes);
 	}
 }
