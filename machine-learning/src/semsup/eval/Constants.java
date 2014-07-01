@@ -11,14 +11,17 @@ import java.util.Set;
 public class Constants {
   
   public static int folds;
-  public static int devFolds;
   public static int maxLabeled;
   public static int step;
   public static int iterations;
-  public static int devIterations;
   public static int rndSeed;
   public static double defaultLambda;
    
+  public static int devFolds;
+  public static int devIterations;
+  public static boolean gridSearch;
+  public static List<Float> lambdas = new LinkedList<Float>(); 
+  
   public static List<String> phenotypes = new LinkedList<String>();
   public static List<Integer> unlabeledSizes = new LinkedList<Integer>();
 	
@@ -48,16 +51,22 @@ public class Constants {
       properties.load(new FileInputStream(propertiesFile));
     } catch (Exception e) {
       System.err.println("couldn't open properties file: " + propertiesFile);
+      return;
     }
     
     folds = Integer.parseInt((String) properties.get("folds"));
-    devFolds = Integer.parseInt((String) properties.get("devFolds"));
     maxLabeled = Integer.parseInt((String) properties.get("maxLabeled"));
     step = Integer.parseInt((String) properties.get("step"));
     iterations = Integer.parseInt((String) properties.get("iterations"));
-    devIterations = Integer.parseInt((String) properties.get("devIterations"));
     rndSeed = Integer.parseInt((String) properties.get("rndSeed"));
     defaultLambda = Double.parseDouble((String) properties.get("defaultLambda"));
+    
+    devFolds = Integer.parseInt((String) properties.get("devFolds"));
+    devIterations = Integer.parseInt((String) properties.get("devIterations"));
+    gridSearch = Boolean.parseBoolean((String) properties.get("gridSearch"));
+    for(String lambda : ((String) properties.get("lambdas")).split(",")) {
+      lambdas.add(Float.parseFloat(lambda));
+    }
     
     for(String phenotype : ((String) properties.get("phenotypes")).split(",")) {
       phenotypes.add(phenotype);  
@@ -84,12 +93,18 @@ public class Constants {
 	 */
 	public static void print() {
 	  
-	  System.out.format("%20s %d\n", "folds", folds);
-	  System.out.format("%20s %d\n", "dev folds", devFolds);
-	  System.out.format("%20s %d\n", "step", step);
-	  System.out.format("%20s %d\n", "iterations", iterations);
-	  System.out.format("%20s %d\n", "dev iterations", devIterations);
-	  System.out.format("%20s %s\n", "phenotypes", phenotypes);
-	  System.out.format("%20s %s\n", "unlabeled sizes", unlabeledSizes);
+	  System.out.format("%15s %d\n", "folds", folds);
+	  System.out.format("%15s %d\n", "step", step);
+	  System.out.format("%15s %d\n", "iterations", iterations);
+	  System.out.format("%15s %s\n", "phenotypes", phenotypes);
+	  System.out.format("%15s %s\n", "unlabeled sizes", unlabeledSizes);
+	  
+	  if(gridSearch) {
+	    System.out.format("%15s %d\n", "dev folds", devFolds);
+	    System.out.format("%15s %d\n", "dev iterations", devIterations);
+	    System.out.format("%15s %s\n", "lambdas", lambdas);
+	  } else {
+	    System.out.format("%15s %f\n", "default lambda", defaultLambda);
+	  }
 	}
 }

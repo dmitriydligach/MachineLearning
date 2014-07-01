@@ -89,7 +89,14 @@ public class EvaluatePhenotype extends Thread {
       Dataset nontest = splits[fold].getPoolSet();
       Dataset test = splits[fold].getTestSet();
       labeled.add(nontest.popRandom(configuration.numLabeled, new Random(Constants.rndSeed)));
-      double lambda = findBestLambda(labeled, unlabeled, dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
+      
+      double lambda;
+      if(Constants.gridSearch) {
+        lambda = findBestLambda(labeled, unlabeled, dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
+      } else {
+        lambda = Constants.defaultLambda;
+      }
+      
       double accuracy = EmAlgorithm.runAndEvaluate(
           labeled, 
           unlabeled,
@@ -109,18 +116,16 @@ public class EvaluatePhenotype extends Thread {
    */
   public double findBestLambda(Dataset labeled, Dataset unlabeled, Alphabet labelAlphabet, Alphabet featureAlphabet) {
     
-    double[] lambdas = {0.0, 0.25, 0.5};
-    
     double bestLambda = 1;
     double bestAccuracy = -1;
-    for(double lambda : lambdas) {
+    for(double lambda : Constants.lambdas) {
       double accuracy = evaluateLambda(labeled, unlabeled, labelAlphabet, featureAlphabet, lambda);
       if(accuracy > bestAccuracy) {
         bestAccuracy = accuracy;
         bestLambda = lambda;
       }
     }
-    
+
     return bestLambda;
   }
   
