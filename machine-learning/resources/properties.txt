@@ -9,7 +9,7 @@ defaultLambda=1.0
 
 devFolds=5
 devIterations=15
-gridSearch=false
+gridSearch=true
 lambdas=0.0,0.25,0.5
 
 phenotypes=cd,uc,ms,t2d
