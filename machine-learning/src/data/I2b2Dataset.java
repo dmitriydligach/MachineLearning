@@ -73,6 +73,8 @@ public class I2b2Dataset extends Dataset {
       	instances.add(instance);
       }
     }
+    
+    scan.close();
 	}
 	
 	 /**
@@ -133,6 +135,8 @@ public class I2b2Dataset extends Dataset {
       unlabeledInstances.add(instance);
     }
     
+    scan.close();
+    
     // select a random sample of n examples
     Collections.shuffle(unlabeledInstances, new Random(100));
     this.instances = unlabeledInstances.subList(0, n);
@@ -154,6 +158,7 @@ public class I2b2Dataset extends Dataset {
 			patientNumToLabel.put(elements[0], elements[1]);
 		}
 		
+		scan.close();
 		return patientNumToLabel;
 	}
 	

@@ -105,6 +105,7 @@ public class EvaluatePhenotype extends Thread {
           dataset.getFeatureAlphabet(),
           configuration.numIterations,
           lambda);
+      
       cumulativeAccuracy = cumulativeAccuracy + accuracy;
     }
 
