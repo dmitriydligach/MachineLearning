@@ -114,14 +114,19 @@ public class EvaluatePhenotype extends Thread {
   
   /**
    * Search for best lambda using labeled training data.
+   * Begin with lambda=0 (i.e. unlabeled data has zero weight). 
+   * New value of lambda is returned if its performance is higher than a threshold.
    */
   public double findBestLambda(Dataset labeled, Dataset unlabeled, Alphabet labelAlphabet, Alphabet featureAlphabet) {
+
+    // unlabeled data has no effect by default
+    double bestLambda = 0; 
+    double bestAccuracy = evaluateLambda(labeled, unlabeled, labelAlphabet, featureAlphabet, bestLambda);
     
-    double bestLambda = 1;
-    double bestAccuracy = -1;
+    // now try the other values and see if they differ enough
     for(double lambda : Constants.lambdas) {
       double accuracy = evaluateLambda(labeled, unlabeled, labelAlphabet, featureAlphabet, lambda);
-      if(accuracy > bestAccuracy) {
+      if((accuracy - bestAccuracy) > Constants.delta) { 
         bestAccuracy = accuracy;
         bestLambda = lambda;
       }
