@@ -20,11 +20,13 @@ public class Constants {
   public static int devFolds;
   public static int devIterations;
   public static boolean gridSearch;
+  public static float delta;
   public static List<Float> lambdas = new LinkedList<Float>(); 
   
   public static List<String> phenotypes = new LinkedList<String>();
   public static List<Integer> unlabeledSizes = new LinkedList<Integer>();
 	
+  public static String dataDir;
   public static String cdData;
 	public static String cdLabels;
 	public static String ucData;
@@ -75,14 +77,15 @@ public class Constants {
       unlabeledSizes.add(Integer.parseInt(unlabeledSize));
     }
     
-    cdData = (String) properties.get("cdData");
-    cdLabels = (String) properties.get("cdLabels");
-    ucData = (String) properties.get("ucData");
-    ucLabels = (String) properties.get("ucLabels");
-    msData = (String) properties.get("msData");
-    msLabels = (String) properties.get("msLabels");
-    t2dData = (String) properties.get("t2dData");
-    t2dLabels = (String) properties.get("t2dLabels");
+    dataDir = (String) properties.get("dataDir");
+    cdData = dataDir + (String) properties.get("cdData");
+    cdLabels = dataDir + (String) properties.get("cdLabels");
+    ucData = dataDir + (String) properties.get("ucData");
+    ucLabels = dataDir + (String) properties.get("ucLabels");
+    msData = dataDir + (String) properties.get("msData");
+    msLabels = dataDir + (String) properties.get("msLabels");
+    t2dData = dataDir + (String) properties.get("t2dData");
+    t2dLabels = dataDir + (String) properties.get("t2dLabels");
     
     outputDir = (String) properties.get("outputDir");
     print();

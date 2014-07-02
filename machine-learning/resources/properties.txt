@@ -15,13 +15,14 @@ lambdas=0.0,0.25,0.5
 phenotypes=cd,uc,ms,t2d
 unlabeledSizes=500,1000,3000,5000
 
-cdData=/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt
-cdLabels=/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-cd.txt
-ucData=/Users/Dima/Boston/Data/Phenotype/IBD/Data/data.txt
-ucLabels=/Users/Dima/Boston/Data/Phenotype/IBD/Data/labels-uc.txt
-msData=/Users/Dima/Boston/Data/Phenotype/MS/Data/data.txt
-msLabels=/Users/Dima/Boston/Data/Phenotype/MS/Data/labels.txt
-t2dData=/Users/Dima/Boston/Data/Phenotype/T2D/Data/data.txt
-t2dLabels=/Users/Dima/Boston/Data/Phenotype/T2D/Data/labels.txt
+dataDir=/Users/Dima/Boston/Data/Phenotype/
+cdData=IBD/Data/data.txt
+cdLabels=IBD/Data/labels-cd.txt
+ucData=IBD/Data/data.txt
+ucLabels=IBD/Data/labels-uc.txt
+msData=MS/Data/data.txt
+msLabels=MS/Data/labels.txt
+t2dData=T2D/Data/data.txt
+t2dLabels=T2D/Data/labels.txt
 
 outputDir=/Users/Dima/Boston/Out/
