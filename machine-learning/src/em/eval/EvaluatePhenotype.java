@@ -36,12 +36,10 @@ public class EvaluatePhenotype extends Thread {
     }
 
     for(int labeled = Constants.step; labeled < Constants.maxLabeled; labeled += Constants.step) {
-      // for a fixed number of labeled examples, create configurations with varying number of unlabeled examples 
+      // configurations with varying number of unlabeled examples for a fixed number of labeled examples 
       List<Configuration> configurations = Configuration.createConfigurations(phenotype, labeled);
-
       StringBuilder output = new StringBuilder();
       output.append(String.format("%-3d ", labeled));
-
       for(Configuration configuration : configurations) {
         double accuracy;
         if(configuration.numUnlabeled == 0) {
@@ -51,10 +49,8 @@ public class EvaluatePhenotype extends Thread {
         }
         output.append(String.format("%.4f ", accuracy));
       }
-
-      output.append("\n");      
       try {
-        Files.append(output, file, Charsets.UTF_8);
+        Files.append(output + "\n", file, Charsets.UTF_8);
       } catch (IOException e) {
         System.err.println("could not write output file!");
       }
