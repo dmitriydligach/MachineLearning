@@ -17,10 +17,9 @@ public class Constants {
   public static int rndSeed;
   public static double defaultLambda;
    
+  public static boolean gridSearch;
   public static int devFolds;
   public static int devIterations;
-  public static boolean gridSearch;
-  public static float delta;
   public static List<Float> lambdas = new LinkedList<Float>(); 
   
   public static List<String> phenotypes = new LinkedList<String>();
@@ -63,10 +62,9 @@ public class Constants {
     rndSeed = Integer.parseInt((String) properties.get("rndSeed"));
     defaultLambda = Double.parseDouble((String) properties.get("defaultLambda"));
     
+    gridSearch = Boolean.parseBoolean((String) properties.get("gridSearch"));
     devFolds = Integer.parseInt((String) properties.get("devFolds"));
     devIterations = Integer.parseInt((String) properties.get("devIterations"));
-    gridSearch = Boolean.parseBoolean((String) properties.get("gridSearch"));
-    delta = Float.parseFloat((String) properties.get("delta"));
     for(String lambda : ((String) properties.get("lambdas")).split(",")) {
       lambdas.add(Float.parseFloat(lambda));
     }
@@ -106,7 +104,6 @@ public class Constants {
 	  if(gridSearch) {
 	    System.out.format("%15s %d\n", "dev folds", devFolds);
 	    System.out.format("%15s %d\n", "dev iterations", devIterations);
-	    System.out.format("%15s %f\n", "delta", delta);
 	    System.out.format("%15s %s\n", "lambdas", lambdas);
 	  } else {
 	    System.out.format("%15s %f\n", "default lambda", defaultLambda);

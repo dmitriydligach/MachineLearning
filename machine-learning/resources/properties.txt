@@ -7,10 +7,9 @@ iterations=25
 rndSeed=100
 defaultLambda=1.0
 
+gridSearch=true
 devFolds=5
 devIterations=15
-gridSearch=true
-delta=0.05
 lambdas=0.05,0.10,0.25,0.5
 
 phenotypes=cd,uc,ms,t2d
