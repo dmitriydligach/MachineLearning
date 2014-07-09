@@ -3,8 +3,11 @@ package em.eval;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+
+import org.apache.commons.math3.stat.StatUtils;
 
 import semsup.eval.Configuration;
 import semsup.eval.Constants;
@@ -117,14 +120,18 @@ public class EvaluatePhenotype extends Thread {
 
     // unlabeled data has no effect by default
     double bestLambda = 0; 
-    double bestAccuracy = evaluateLambda(labeled, unlabeled, labelAlphabet, featureAlphabet, bestLambda);
+    double[] bestResult = evaluateLambda(labeled, unlabeled, labelAlphabet, featureAlphabet, bestLambda);
+    double bestAccuracy = bestResult[0];
+    double bestVariance = bestResult[1];
     
     // now try the other values and see if they differ enough
     for(double lambda : Constants.lambdas) {
-      double accuracy = evaluateLambda(labeled, unlabeled, labelAlphabet, featureAlphabet, lambda);
-      if((accuracy - bestAccuracy) > Constants.delta) { 
+      double accuracy = evaluateLambda(labeled, unlabeled, labelAlphabet, featureAlphabet, lambda)[0];
+      if((accuracy - bestAccuracy) > bestVariance) { 
         bestAccuracy = accuracy;
         bestLambda = lambda;
+        
+        // pick model with smallest variance?
       }
     }
 
@@ -133,14 +140,15 @@ public class EvaluatePhenotype extends Thread {
   
   /**
    * Evaluate a specific value of lambda using n-fold CV.
+   * Return n-fold CV accuracy and n-fold CV variance.
    */
-  public double evaluateLambda(Dataset labeled, Dataset unlabeled, Alphabet labelAlphabet, Alphabet featureAlphabet, double lambda) {
+  public double[] evaluateLambda(Dataset labeled, Dataset unlabeled, Alphabet labelAlphabet, Alphabet featureAlphabet, double lambda) {
     
     Split[] splits = labeled.split(Constants.devFolds);
-    double cumulativeAccuracy = 0;
+    double[] accuracies = new double[Constants.devFolds];
     
     for(int fold = 0; fold < Constants.devFolds; fold++) {      
-      double accuracy = EmAlgorithm.runAndEvaluate(
+      accuracies[fold] = EmAlgorithm.runAndEvaluate(
           splits[fold].getPoolSet(), 
           unlabeled,
           splits[fold].getTestSet(), 
@@ -148,9 +156,9 @@ public class EvaluatePhenotype extends Thread {
           featureAlphabet,
           Constants.devIterations,
           lambda);
-      cumulativeAccuracy = cumulativeAccuracy + accuracy;
     }
-   
-    return cumulativeAccuracy / Constants.devFolds;
+
+    double[] meanAndVariance = {StatUtils.mean(accuracies), StatUtils.variance(accuracies)};
+    return meanAndVariance;
   }
 }
