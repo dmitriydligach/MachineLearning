@@ -3,7 +3,6 @@ package em.eval;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -88,14 +87,14 @@ public class EvaluatePhenotype extends Thread {
       Dataset nontest = splits[fold].getPoolSet();
       Dataset test = splits[fold].getTestSet();
       labeled.add(nontest.popRandom(configuration.numLabeled, new Random(Constants.rndSeed)));
-      
+
       double lambda;
       if(Constants.gridSearch) {
         lambda = findBestLambda(labeled, unlabeled, dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
       } else {
         lambda = Constants.defaultLambda;
       }
-      
+
       double accuracy = EmAlgorithm.runAndEvaluate(
           labeled, 
           unlabeled,
@@ -104,51 +103,50 @@ public class EvaluatePhenotype extends Thread {
           dataset.getFeatureAlphabet(),
           configuration.numIterations,
           lambda);
-      
+
       cumulativeAccuracy = cumulativeAccuracy + accuracy;
     }
 
     return cumulativeAccuracy / Constants.folds;
   }
-  
+
   /**
    * Search for best lambda using labeled training data.
-   * Begin with lambda=0 (i.e. unlabeled data has zero weight). 
+   * Begin with lambda = 0 (i.e. unlabeled data has zero weight). 
    * New value of lambda is returned if its performance is higher than a threshold.
    */
   public double findBestLambda(Dataset labeled, Dataset unlabeled, Alphabet labelAlphabet, Alphabet featureAlphabet) {
 
     // unlabeled data has no effect by default
     double bestLambda = 0; 
-    double[] bestResult = evaluateLambda(labeled, unlabeled, labelAlphabet, featureAlphabet, bestLambda);
-    double bestAccuracy = bestResult[0];
-    double bestVariance = bestResult[1];
-    
+    double[] baseFoldAccuracy = evaluateLambda(labeled, unlabeled, labelAlphabet, featureAlphabet, bestLambda);
+    double bestAccuracy = StatUtils.mean(baseFoldAccuracy);
+
     // now try the other values and see if they differ enough
     for(double lambda : Constants.lambdas) {
-      double accuracy = evaluateLambda(labeled, unlabeled, labelAlphabet, featureAlphabet, lambda)[0];
-      if((accuracy - bestAccuracy) > bestVariance) { 
+      double[] foldAccuracy = evaluateLambda(labeled, unlabeled, labelAlphabet, featureAlphabet, lambda);
+      double accuracy = StatUtils.mean(foldAccuracy);
+      double variance = StatUtils.variance(foldAccuracy);
+      if((accuracy - bestAccuracy) > variance) {
         bestAccuracy = accuracy;
         bestLambda = lambda;
-        
-        // pick model with smallest variance?
       }
     }
 
     return bestLambda;
   }
-  
+
   /**
    * Evaluate a specific value of lambda using n-fold CV.
-   * Return n-fold CV accuracy and n-fold CV variance.
+   * Return each fold's performance in a double array.
    */
   public double[] evaluateLambda(Dataset labeled, Dataset unlabeled, Alphabet labelAlphabet, Alphabet featureAlphabet, double lambda) {
-    
+
     Split[] splits = labeled.split(Constants.devFolds);
-    double[] accuracies = new double[Constants.devFolds];
+    double[] foldAccuracy = new double[Constants.devFolds];
     
     for(int fold = 0; fold < Constants.devFolds; fold++) {      
-      accuracies[fold] = EmAlgorithm.runAndEvaluate(
+      foldAccuracy[fold] = EmAlgorithm.runAndEvaluate(
           splits[fold].getPoolSet(), 
           unlabeled,
           splits[fold].getTestSet(), 
@@ -158,7 +156,6 @@ public class EvaluatePhenotype extends Thread {
           lambda);
     }
 
-    double[] meanAndVariance = {StatUtils.mean(accuracies), StatUtils.variance(accuracies)};
-    return meanAndVariance;
+    return foldAccuracy;
   }
 }
