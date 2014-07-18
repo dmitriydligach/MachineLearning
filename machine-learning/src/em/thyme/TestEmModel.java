@@ -12,9 +12,9 @@ public class TestEmModel {
   public static void main(String[] args) throws IOException {
 
     Dataset trainSet = new Dataset();
-    trainSet.loadCSVFile("/Users/Dima/Boston/Data/Thyme/Vectors/DocTimeRel/train.txt");
+    trainSet.loadCSVFile("/Users/Dima/Boston/Data/Thyme/Vectors/EventTimeContains/train.txt");
     Dataset testSet = new Dataset();
-    testSet.loadCSVFile("/Users/Dima/Boston/Data/Thyme/Vectors/DocTimeRel/test.txt");
+    testSet.loadCSVFile("/Users/Dima/Boston/Data/Thyme/Vectors/EventTimeContains/test.txt");
 
     trainSet.makeAlphabets();
     trainSet.makeVectors();

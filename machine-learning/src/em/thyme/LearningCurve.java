@@ -5,18 +5,16 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Random;
 
-import semsup.eval.Constants;
 import data.Dataset;
 import em.implementation.EmModel;
 
 public class LearningCurve {
 
-  public static final int STEP = 50;
-  public static final int MAXLABELED = 10000;
-  public static final int ITERATIONS = 25;
+  public static final int STEP = 100;
+  public static final int MAXLABELED = 4000;
   public static final int RNDSEED = 100;
-  public static final String TRAINSET = "/Users/Dima/Boston/Data/Thyme/Vectors/DocTimeRel/train.txt";
-  public static final String TESTSET = "/Users/Dima/Boston/Data/Thyme/Vectors/DocTimeRel/test.txt";
+  public static final String TRAINSET = "/Users/Dima/Boston/Data/Thyme/Vectors/EventTimeContains/train.txt";
+  public static final String TESTSET = "/Users/Dima/Boston/Data/Thyme/Vectors/EventTimeContains/test.txt";
   
   public static void main(String[] args) throws IOException {
     for(int numberOfLabeledExamples = STEP; numberOfLabeledExamples < MAXLABELED; numberOfLabeledExamples += STEP) {
@@ -42,7 +40,7 @@ public class LearningCurve {
     labeled.makeVectors();
 
     labeled.setInstanceClassProbabilityDistribution(new HashSet<String>(pool.getLabelAlphabet().getStrings()));
-    EmModel classifier = new EmModel(pool.getLabelAlphabet(), Constants.defaultLambda);
+    EmModel classifier = new EmModel(pool.getLabelAlphabet(), 1);
     classifier.train(labeled);
     double accuracy = classifier.test(test);
     

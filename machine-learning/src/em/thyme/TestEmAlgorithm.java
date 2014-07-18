@@ -4,19 +4,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Random;
 
-import semsup.eval.Constants;
 import data.Dataset;
 import em.implementation.EmAlgorithm;
 
 public class TestEmAlgorithm {
 
   public static final int STEP = 50;
-  public static final int MAXLABELED = 5000;
-  public static final int NUMUNLABELED = 5000;
+  public static final int MAXLABELED = 3000;
+  public static final int NUMUNLABELED = 300;
   public static final int ITERATIONS = 25;
   public static final int RNDSEED = 100;
-  public static final String TRAINSET = "/Users/Dima/Boston/Data/Thyme/Vectors/DocTimeRel/train.txt";
-  public static final String TESTSET = "/Users/Dima/Boston/Data/Thyme/Vectors/DocTimeRel/test.txt";
+  public static final String TRAINSET = "/Users/Dima/Boston/Data/Thyme/Vectors/EventTimeContains/train.txt";
+  public static final String TESTSET = "/Users/Dima/Boston/Data/Thyme/Vectors/EventTimeContains/test.txt";
 
   public static void main(String[] args) throws IOException {
     for(int numberOfLabeledExamples = STEP; numberOfLabeledExamples < MAXLABELED; numberOfLabeledExamples += STEP) {
@@ -48,7 +47,7 @@ public class TestEmAlgorithm {
         pool.getLabelAlphabet(), 
         pool.getFeatureAlphabet(),
         iterations,
-        Constants.defaultLambda);
+        1);
 
     return accuracy;
   }
