@@ -8,18 +8,17 @@ import java.util.Random;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
-import semsup.eval.Constants;
 import data.Dataset;
 import em.implementation.EmAlgorithm;
 
 public class TestEmAlgorithm {
 
-  public static final int STEP = 50;
-  public static final int MAXLABELED = 3000;
-  public static final int NUMUNLABELED = 100;
+  public static final int STEP = 100;
+  public static final int MAXLABELED = 2000;
+  public static final int NUMUNLABELED = 200;
   public static final int ITERATIONS = 25;
   public static final int RNDSEED = 100;
-  public static final double LAMBDA = 0.5;
+  public static final double LAMBDA = 1;
   public static final String TRAINSET = "/Users/Dima/Boston/Data/Thyme/Vectors/EventTimeContains/train.txt";
   public static final String TESTSET = "/Users/Dima/Boston/Data/Thyme/Vectors/EventTimeContains/test.txt";
   public static final String OUTFILE = "/Users/Dima/Boston/Out/unlabeled";
