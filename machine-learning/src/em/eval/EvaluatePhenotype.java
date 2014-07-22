@@ -37,6 +37,7 @@ public class EvaluatePhenotype extends Thread {
       file.delete();
     }
 
+    double stdErrDenominator = Math.sqrt(Constants.folds);    
     for(int labeled = Constants.step; labeled < Constants.maxLabeled; labeled += Constants.step) {
       // configurations with varying number of unlabeled examples for a fixed number of labeled examples 
       List<Configuration> configurations = Configuration.createConfigurations(phenotype, labeled);
@@ -44,17 +45,17 @@ public class EvaluatePhenotype extends Thread {
       output.append(String.format("%-3d ", labeled));
       for(Configuration configuration : configurations) {
         double accuracy;
-        double std;
+        double stdErr;
         if(configuration.numUnlabeled == 0) {
           double[] foldAccuracy = Evaluation.evaluateBaseline(configuration);
           accuracy = StatUtils.mean(foldAccuracy);
-          std = Math.sqrt(StatUtils.variance(foldAccuracy));
+          stdErr = Math.sqrt(StatUtils.variance(foldAccuracy)) / stdErrDenominator;
         } else {
           double[] foldAccuracy = evaluate(configuration);
           accuracy = StatUtils.mean(foldAccuracy);
-          std = Math.sqrt(StatUtils.variance(foldAccuracy));
+          stdErr = Math.sqrt(StatUtils.variance(foldAccuracy)) / stdErrDenominator;
         }
-        output.append(String.format("%.4f ", accuracy));
+        output.append(String.format("%.4f %.4f ", accuracy, stdErr));
       }
       try {
         Files.append(output + "\n", file, Charsets.UTF_8);
