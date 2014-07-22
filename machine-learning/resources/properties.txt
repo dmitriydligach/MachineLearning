@@ -7,7 +7,7 @@ iterations=25
 rndSeed=100
 defaultLambda=1.0
 
-gridSearch=true
+gridSearch=false
 devFolds=5
 devIterations=15
 lambdas=0.05,0.10,0.25,0.5

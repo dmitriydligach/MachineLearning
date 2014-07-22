@@ -44,10 +44,15 @@ public class EvaluatePhenotype extends Thread {
       output.append(String.format("%-3d ", labeled));
       for(Configuration configuration : configurations) {
         double accuracy;
+        double std;
         if(configuration.numUnlabeled == 0) {
-          accuracy = Evaluation.evaluateBaseline(configuration);
+          double[] foldAccuracy = Evaluation.evaluateBaseline(configuration);
+          accuracy = StatUtils.mean(foldAccuracy);
+          std = Math.sqrt(StatUtils.variance(foldAccuracy));
         } else {
-          accuracy = evaluate(configuration);
+          double[] foldAccuracy = evaluate(configuration);
+          accuracy = StatUtils.mean(foldAccuracy);
+          std = Math.sqrt(StatUtils.variance(foldAccuracy));
         }
         output.append(String.format("%.4f ", accuracy));
       }
@@ -62,7 +67,7 @@ public class EvaluatePhenotype extends Thread {
   /**
    * Evaluate a configuration. Return n-fold CV accuracy.
    */
-  public double evaluate(Configuration configuration) {
+  public double[] evaluate(Configuration configuration) {
 
     I2b2Dataset dataset = new I2b2Dataset();
     I2b2Dataset unlabeled = new I2b2Dataset();
@@ -80,7 +85,7 @@ public class EvaluatePhenotype extends Thread {
     dataset.makeAlphabets();
 
     Split[] splits = dataset.split(Constants.folds);
-    double cumulativeAccuracy = 0;
+    double[] foldAccuracy = new double[Constants.folds];
 
     for(int fold = 0; fold < Constants.folds; fold++) {
       Dataset labeled = new Dataset();
@@ -95,7 +100,7 @@ public class EvaluatePhenotype extends Thread {
         lambda = Constants.defaultLambda;
       }
 
-      double accuracy = EmAlgorithm.runAndEvaluate(
+      foldAccuracy[fold] = EmAlgorithm.runAndEvaluate(
           labeled, 
           unlabeled,
           test, 
@@ -103,11 +108,9 @@ public class EvaluatePhenotype extends Thread {
           dataset.getFeatureAlphabet(),
           configuration.numIterations,
           lambda);
-
-      cumulativeAccuracy = cumulativeAccuracy + accuracy;
     }
 
-    return cumulativeAccuracy / Constants.folds;
+    return foldAccuracy;
   }
 
   /**

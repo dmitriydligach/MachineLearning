@@ -12,9 +12,10 @@ import em.implementation.EmModel;
 public class Evaluation {
 
   /**
-   * Use labeled data only.
+   * Baseline evaluation for semi-supervised learning. Train a model
+   * using labeled data only and returned the performance for each fold. 
    */
-  public static double evaluateBaseline(Configuration configuration) {
+  public static double[] evaluateBaseline(Configuration configuration) {
 
     I2b2Dataset dataset = new I2b2Dataset();
     try {
@@ -29,8 +30,8 @@ public class Evaluation {
     dataset.makeAlphabets();
 
     Split[] splits = dataset.split(Constants.folds);
-    double cumulativeAccuracy = 0;
-
+    double[] foldAccuracy = new double[Constants.folds];
+    
     for(int fold = 0; fold < Constants.folds; fold++) {
       Dataset labeled = new Dataset();
       Dataset nontest = splits[fold].getPoolSet();
@@ -47,11 +48,9 @@ public class Evaluation {
  
       test.setAlphabets(dataset.getLabelAlphabet(), dataset.getFeatureAlphabet());
       test.makeVectors();
-      double accuracy = classifier.test(test);
-
-      cumulativeAccuracy += accuracy;
+      foldAccuracy[fold] = classifier.test(test);
     }
 
-    return cumulativeAccuracy / Constants.folds;    
+    return foldAccuracy;    
   }  
 }

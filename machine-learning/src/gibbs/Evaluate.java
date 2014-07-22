@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.math3.stat.StatUtils;
+
 import semsup.eval.Configuration;
 import semsup.eval.Constants;
 import semsup.eval.Evaluation;
@@ -39,7 +41,8 @@ public class Evaluate {
       for(Configuration configuration : configurations) {
         double accuracy = 0.0;
         if(configuration.numUnlabeled == 0) {
-          accuracy = Evaluation.evaluateBaseline(configuration);
+          double[] foldAccuracy = Evaluation.evaluateBaseline(configuration);
+          accuracy = StatUtils.mean(foldAccuracy);
         } else {
           accuracy = evaluateSampler(configuration);
         }
