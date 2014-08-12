@@ -44,8 +44,9 @@ public class Constants {
 	
 	/**
 	 * Read constants from a properties file.
+	 * Print the important ones if the verbose argument is true.
 	 */
-	public static void populate(String propertiesFile) {
+	public static void populate(String propertiesFile, Boolean verbose) {
 	  
     Properties properties = new Properties();
     try {
@@ -87,7 +88,7 @@ public class Constants {
     t2dLabels = dataDir + (String) properties.get("t2dLabels");
     
     outputDir = (String) properties.get("outputDir");
-    print();
+    if(verbose) {print();}
 	}
 	
 	/**
