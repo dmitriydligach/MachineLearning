@@ -12,7 +12,6 @@ public class Evaluate {
     if(args.length < 1) {
       System.err.println("Please specify location of properties file");
     } else {
-      System.out.format("%15s %s\n", "properties file", args[0]);
       Constants.populate(args[0], true);  
     }
 
