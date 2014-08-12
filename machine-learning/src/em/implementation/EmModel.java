@@ -3,8 +3,15 @@ package em.implementation;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
+import com.google.common.collect.Ordering;
 
 import utils.Misc;
 import data.Alphabet;
@@ -366,5 +373,28 @@ public class EmModel {
     assert !Double.isInfinite(p[0]);
     assert !Double.isInfinite(p[1]);
     return p;
+  }
+  
+  /**
+   * Feature weights that determine feature contributiones.
+   * I think these are called feature log-odds. 
+   */
+  public void computeFeatureWeights(Alphabet featureAlphabet) {
+
+    Map<String, Double> featureWeights = new HashMap<String, Double>();
+
+    for(int word = 0; word < numWords; word++) {
+      double weight = Math.log(theta[0][word] / theta[1][word]);
+      String feature = featureAlphabet.getString(word);
+      featureWeights.put(feature, Math.abs(weight));
+    }
+    
+    List<String> featuresSortedByWeight = new ArrayList<String>(featureWeights.keySet());
+    Function<String, Double> getValue = Functions.forMap(featureWeights);
+    Collections.sort(featuresSortedByWeight, Ordering.natural().reverse().onResultOf(getValue));
+
+    for(String feature : featuresSortedByWeight) {
+      System.out.println(feature + ": " + featureWeights.get(feature));
+    }
   }
 }
