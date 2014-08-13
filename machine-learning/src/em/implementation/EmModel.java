@@ -3,15 +3,8 @@ package em.implementation;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
-import com.google.common.collect.Ordering;
 
 import utils.Misc;
 import data.Alphabet;
@@ -376,25 +369,22 @@ public class EmModel {
   }
   
   /**
-   * Feature weights that determine feature contributiones.
-   * I think these are called feature log-odds. 
+   * Compute feature weights for the naive bayes classifer.
+   * Naive Bayes classifier can be written as a linear classifier: 
+   * 
+   * log (p(c1|d) / p(c2|d)) =
+   *   log(p(c1) / p(c2)) + sum[count(w_i) * log(p(w_i|c1) / p(w_i|c2))]
+   * 
+   * Here log(p(w_i|c1) / p(w_i|c2)) terms can be viewed as weights.
    */
-  public void computeFeatureWeights(Alphabet featureAlphabet) {
+  public Map<String, Double> computeFeatureWeights(Alphabet featureAlphabet) {
 
     Map<String, Double> featureWeights = new HashMap<String, Double>();
-
-    for(int word = 0; word < numWords; word++) {
-      double weight = Math.log(theta[0][word] / theta[1][word]);
-      String feature = featureAlphabet.getString(word);
-      featureWeights.put(feature, Math.abs(weight));
+    for(int wordIndex = 0; wordIndex < numWords; wordIndex++) {
+      double weight = Math.log(theta[0][wordIndex] / theta[1][wordIndex]);
+      String featureName = featureAlphabet.getString(wordIndex);
+      featureWeights.put(featureName, Math.abs(weight));
     }
-    
-    List<String> featuresSortedByWeight = new ArrayList<String>(featureWeights.keySet());
-    Function<String, Double> getValue = Functions.forMap(featureWeights);
-    Collections.sort(featuresSortedByWeight, Ordering.natural().reverse().onResultOf(getValue));
-
-    for(String feature : featuresSortedByWeight) {
-      System.out.println(feature + ": " + featureWeights.get(feature));
-    }
+    return featureWeights;
   }
 }
