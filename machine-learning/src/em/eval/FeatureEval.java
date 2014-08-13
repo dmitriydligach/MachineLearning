@@ -1,9 +1,19 @@
 package em.eval;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import semsup.eval.Constants;
+import utils.CuiLookup;
+
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
+import com.google.common.collect.Ordering;
+
 import data.Dataset;
 import data.I2b2Dataset;
 import data.Split;
@@ -27,7 +37,7 @@ public class FeatureEval {
 		Split[] splits = dataset.split(Constants.folds);
 		double cumulativeAccuracy = 0;
 		
-		for(int fold = 0; fold < Constants.folds; fold++) {
+		for(int fold = 0; fold < 1; fold++) {
 			Dataset trainSet = splits[fold].getPoolSet();
 			Dataset testSet = splits[fold].getTestSet();
 			
@@ -41,6 +51,27 @@ public class FeatureEval {
 			classifier.train(trainSet);
 			double accuracy = classifier.test(testSet);
 			cumulativeAccuracy = cumulativeAccuracy + accuracy;
+			
+			Map<String, Double> featureWeights = classifier.computeFeatureWeights(dataset.getFeatureAlphabet());
+	    List<String> featureNamesSortedByWeight = new ArrayList<String>(featureWeights.keySet());
+	    Function<String, Double> getValue = Functions.forMap(featureWeights);
+	    Collections.sort(featureNamesSortedByWeight, Ordering.natural().reverse().onResultOf(getValue));
+			
+	    CuiLookup mapper = null;
+	    try {
+	      mapper = new CuiLookup("resources/snomed-only-uniq-codes.txt");
+	    } catch (IOException e) {
+	      System.err.println("Cannot read file of cuis!");
+	      System.exit(-1);
+	    }
+	    for(String feature : featureNamesSortedByWeight) {
+	      String cui = feature.replace("c", "C").replace("-", "");
+	      String text = mapper.getTerm(cui);
+	      if(text == null) {
+	        text = feature;
+	      }
+	      System.out.println(text + ": " + featureWeights.get(feature));
+	    }
 		}
 		
     double accuracy = cumulativeAccuracy / Constants.folds;
