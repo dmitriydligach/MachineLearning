@@ -35,7 +35,7 @@ public class FeatureEval {
 		dataset.makeAlphabets();
 		
 		Split[] splits = dataset.split(Constants.folds);
-		double cumulativeAccuracy = 0;
+		double cumulAcc = 0;
 		
 		for(int fold = 0; fold < 1; fold++) {
 			Dataset trainSet = splits[fold].getPoolSet();
@@ -50,7 +50,7 @@ public class FeatureEval {
 			EmModel classifier = new EmModel(dataset.getLabelAlphabet(), 1.0);
 			classifier.train(trainSet);
 			double accuracy = classifier.test(testSet);
-			cumulativeAccuracy = cumulativeAccuracy + accuracy;
+			cumulAcc = cumulAcc + accuracy;
 			
 			Map<String, Double> featureWeights = classifier.computeFeatureWeights(dataset.getFeatureAlphabet());
 	    List<String> featureNamesSortedByWeight = new ArrayList<String>(featureWeights.keySet());
@@ -58,23 +58,17 @@ public class FeatureEval {
 	    Collections.sort(featureNamesSortedByWeight, Ordering.natural().reverse().onResultOf(getValue));
 			
 	    CuiLookup mapper = null;
-	    try {
-	      mapper = new CuiLookup("resources/snomed-only-uniq-codes.txt");
-	    } catch (IOException e) {
-	      System.err.println("Cannot read file of cuis!");
-	      System.exit(-1);
-	    }
+	    mapper = new CuiLookup("resources/snomed-only-uniq-codes.txt");
 	    for(String feature : featureNamesSortedByWeight) {
-	      String cui = feature.replace("c", "C").replace("-", "");
-	      String text = mapper.getTerm(cui);
+	      String capitalizedNegationRemoved = feature.replace("c", "C").replace("-", "");
+	      String text = mapper.getTerm(capitalizedNegationRemoved);
 	      if(text == null) {
-	        text = feature;
+	        text = "n/a";
 	      }
-	      System.out.println(text + ": " + featureWeights.get(feature));
+	      System.out.format("%12s %-60s %.4f\n", feature, text, featureWeights.get(feature));
 	    }
 		}
 		
-    double accuracy = cumulativeAccuracy / Constants.folds;
-    System.out.format("%d-fold cv accuracy: %.4f\n", Constants.folds, accuracy);
+    // System.out.format("%d-fold cv accuracy: %.4f\n", Constants.folds, cumulAcc / Constants.folds);
 	}
 }
