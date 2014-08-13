@@ -20,12 +20,14 @@ public class FeatureEval {
     }
 	  
 		I2b2Dataset dataset = new I2b2Dataset();
-		dataset.loadCSVFile(Constants.cdData, Constants.cdLabels);
+		dataset.loadCSVFile(Constants.msData, Constants.msLabels);
+    dataset.mapLabels(Constants.msSourceLabels, Constants.msTargetLabel);
 		dataset.makeAlphabets();
 		
 		Split[] splits = dataset.split(Constants.folds);
+		double cumulativeAccuracy = 0;
 		
-		for(int fold = 0; fold < 1; fold++) {
+		for(int fold = 0; fold < Constants.folds; fold++) {
 			Dataset trainSet = splits[fold].getPoolSet();
 			Dataset testSet = splits[fold].getTestSet();
 			
@@ -38,9 +40,10 @@ public class FeatureEval {
 			EmModel classifier = new EmModel(dataset.getLabelAlphabet(), 1.0);
 			classifier.train(trainSet);
 			double accuracy = classifier.test(testSet);
-			System.out.format("accuracy: %.4f\n", accuracy);
-			
-			classifier.computeFeatureWeights(dataset.getFeatureAlphabet());
+			cumulativeAccuracy = cumulativeAccuracy + accuracy;
 		}
+		
+    double accuracy = cumulativeAccuracy / Constants.folds;
+    System.out.format("%d-fold cv accuracy: %.4f\n", Constants.folds, accuracy);
 	}
 }
