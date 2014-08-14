@@ -54,16 +54,17 @@ public class NFoldCvFeatureEval {
       double accuracy = classifier.test(testSet);
       cumulAcc = cumulAcc + accuracy;
       
-      displayFeatureWeights(classifier, dataset.getFeatureAlphabet());
+      displayFeatureWeights(classifier, dataset.getFeatureAlphabet(), 5);
     }
 
     // System.out.format("%d-fold cv accuracy: %.4f\n", Constants.folds, cumulAcc / Constants.folds);
   }
 
   /**
-   * Print feature weights.
+   * Print feature weights. 
+   * Last argument specifies the maximum number of features to print.
    */
-  public static void displayFeatureWeights(EmModel model, Alphabet featureAlphabet) throws IOException {
+  public static void displayFeatureWeights(EmModel model, Alphabet featureAlphabet, int maxFeatures) throws IOException {
 
     Map<String, Double> featureWeights = model.computeFeatureWeights(featureAlphabet);
     List<String> featureNamesSortedByWeight = new ArrayList<String>(featureWeights.keySet());
@@ -71,7 +72,10 @@ public class NFoldCvFeatureEval {
     Collections.sort(featureNamesSortedByWeight, Ordering.natural().reverse().onResultOf(getValue));
 
     CuiLookup mapper = new CuiLookup("resources/snomed-only-uniq-codes.txt");
-    for(String feature : featureNamesSortedByWeight) {
+    int featuresToInclude = featureWeights.size() < maxFeatures ? featureWeights.size() : maxFeatures;
+
+    for(int featureNum = 0; featureNum < featuresToInclude; featureNum++) {
+      String feature = featureNamesSortedByWeight.get(featureNum);
       String capitalizedNegationRemoved = feature.replace("c", "C").replace("-", "");
       String text = mapper.getTerm(capitalizedNegationRemoved);
       if(text == null) {

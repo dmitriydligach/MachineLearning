@@ -18,6 +18,7 @@ public class EmFeatureEval {
   public static final int FOLDS = 10; 
   public static final int ACTUALFOLDSTORUN = 1;
   public static final int ITERATIONS = 25;
+  public static final int FEATURESTOPRINT = 10;
 
   public static void main(String[] args) throws IOException {
 
@@ -90,10 +91,10 @@ public class EmFeatureEval {
       em.train(labeledPlusUnlabeled);
 
       // print feature weights
-      if(iteration % ITERATIONS == 0) {
+      if(iteration % (ITERATIONS - 1) == 0) {
         System.out.println("\n* iteration " + iteration + "\n");
         try {
-          NFoldCvFeatureEval.displayFeatureWeights(em, featureAlphabet);
+          NFoldCvFeatureEval.displayFeatureWeights(em, featureAlphabet, FEATURESTOPRINT);
         } catch (IOException e) {
           e.printStackTrace();
         }
