@@ -77,7 +77,8 @@ public class NFoldCvFeatureEval {
       if(text == null) {
         text = "n/a";
       }
-      System.out.format("%12s %-60s %.4f\n", feature, text, featureWeights.get(feature));
+      int charsToPrint = text.length() > 50 ? 50 : text.length(); 
+      System.out.format("%12s %-50s %.4f\n", feature, text.substring(0, charsToPrint), featureWeights.get(feature));
     }
   }
 }
