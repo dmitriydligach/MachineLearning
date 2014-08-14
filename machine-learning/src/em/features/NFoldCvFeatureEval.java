@@ -1,4 +1,4 @@
-package em.eval;
+package em.features;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import data.I2b2Dataset;
 import data.Split;
 import em.implementation.EmModel;
 
-public class FeatureEval {
+public class NFoldCvFeatureEval {
 	
 	public static void main(String[] args) throws IOException {
 
@@ -37,6 +37,7 @@ public class FeatureEval {
 		Split[] splits = dataset.split(Constants.folds);
 		double cumulAcc = 0;
 		
+		// run just one fold and look at feature weights
 		for(int fold = 0; fold < 1; fold++) {
 			Dataset trainSet = splits[fold].getPoolSet();
 			Dataset testSet = splits[fold].getTestSet();
