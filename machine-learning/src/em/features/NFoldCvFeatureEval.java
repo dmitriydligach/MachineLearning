@@ -22,6 +22,10 @@ import em.implementation.EmModel;
 
 public class NFoldCvFeatureEval {
 
+  public static final int FOLDS = 10; 
+  public static final int ACTUALFOLDSTORUN = 10;
+  public static final int FEATURESTOPRINT = 50;
+  
   public static void main(String[] args) throws IOException {
 
     if(args.length < 1) {
@@ -31,15 +35,15 @@ public class NFoldCvFeatureEval {
     }
 
     I2b2Dataset dataset = new I2b2Dataset();
-    dataset.loadCSVFile(Constants.msData, Constants.msLabels);
-    dataset.mapLabels(Constants.msSourceLabels, Constants.msTargetLabel);
+    dataset.loadCSVFile(Constants.t2dData, Constants.t2dLabels);
+    dataset.mapLabels(Constants.t2dSourceLabels, Constants.t2dTargetLabel);
     dataset.makeAlphabets();
 
-    Split[] splits = dataset.split(Constants.folds);
+    Split[] splits = dataset.split(FOLDS);
     double cumulAcc = 0;
 
     // run just one fold and look at feature weights
-    for(int fold = 0; fold < 1; fold++) {
+    for(int fold = 0; fold < ACTUALFOLDSTORUN; fold++) {
       Dataset trainSet = splits[fold].getPoolSet();
       Dataset testSet = splits[fold].getTestSet();
 
@@ -53,11 +57,12 @@ public class NFoldCvFeatureEval {
       classifier.train(trainSet);
       double accuracy = classifier.test(testSet);
       cumulAcc = cumulAcc + accuracy;
-      
-      displayFeatureWeights(classifier, dataset.getFeatureAlphabet(), 5);
+
+      displayFeatureWeights(classifier, dataset.getFeatureAlphabet(), FEATURESTOPRINT);
+      System.out.println();
     }
 
-    // System.out.format("%d-fold cv accuracy: %.4f\n", Constants.folds, cumulAcc / Constants.folds);
+    System.out.format("accuracy: %.4f\n", cumulAcc / ACTUALFOLDSTORUN);
   }
 
   /**
