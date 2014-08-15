@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import semsup.eval.Constants;
-import utils.CuiLookup;
+import utils.UmlsLookup;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
@@ -76,13 +76,13 @@ public class NFoldCvFeatureEval {
     Function<String, Double> getValue = Functions.forMap(featureWeights);
     Collections.sort(featureNamesSortedByWeight, Ordering.natural().reverse().onResultOf(getValue));
 
-    CuiLookup mapper = new CuiLookup("resources/snomed-only-uniq-codes.txt");
+    UmlsLookup umlsLookup = new UmlsLookup("/Users/dima/Boston/Data/Umls/rxnorm-snomedct.txt");
     int featuresToInclude = featureWeights.size() < maxFeatures ? featureWeights.size() : maxFeatures;
 
     for(int featureNum = 0; featureNum < featuresToInclude; featureNum++) {
       String feature = featureNamesSortedByWeight.get(featureNum);
       String capitalizedNegationRemoved = feature.replace("c", "C").replace("-", "");
-      String text = mapper.getTerm(capitalizedNegationRemoved);
+      String text = umlsLookup.getTerm(capitalizedNegationRemoved);
       if(text == null) {
         text = "n/a";
       }
