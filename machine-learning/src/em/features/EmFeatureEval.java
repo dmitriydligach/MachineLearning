@@ -78,6 +78,14 @@ public class EmFeatureEval {
     EmModel em = new EmModel(labelAlphabet, lambda);
     em.train(labeled);
 
+    // feature weights for the model trained on labeled data only
+    System.out.println("\n* Iteration -1" + "\n");
+    try {
+      NFoldCvFeatureEval.displayFeatureWeights(em, featureAlphabet, FEATURESTOPRINT);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    
     for(int iteration = 0; iteration < iterations; iteration++) {
       // E-step
       unlabeled.setAlphabets(labelAlphabet, featureAlphabet);
@@ -90,9 +98,9 @@ public class EmFeatureEval {
       labeledPlusUnlabeled.makeVectors();
       em.train(labeledPlusUnlabeled);
 
-      // print feature weights
-      if(iteration % (ITERATIONS - 1) == 0) {
-        System.out.println("\n* iteration " + iteration + "\n");
+      // feature weights during EM iterations
+      if(iteration % (ITERATIONS - 1) == 0 && iteration != 0) {
+        System.out.println("\n* Iteration " + (iteration + 1) + "\n");
         try {
           NFoldCvFeatureEval.displayFeatureWeights(em, featureAlphabet, FEATURESTOPRINT);
         } catch (IOException e) {
