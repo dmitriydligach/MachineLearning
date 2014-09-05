@@ -18,6 +18,7 @@ public class Constants {
   public static double defaultLambda;
    
   public static boolean gridSearch;
+  public static boolean conservativeSearch;
   public static int devFolds;
   public static int devIterations;
   public static List<Float> lambdas = new LinkedList<Float>(); 
@@ -64,6 +65,7 @@ public class Constants {
     defaultLambda = Double.parseDouble((String) properties.get("defaultLambda"));
     
     gridSearch = Boolean.parseBoolean((String) properties.get("gridSearch"));
+    conservativeSearch = Boolean.parseBoolean((String) properties.getProperty("conservativeSearch"));
     devFolds = Integer.parseInt((String) properties.get("devFolds"));
     devIterations = Integer.parseInt((String) properties.get("devIterations"));
     for(String lambda : ((String) properties.get("lambdas")).split(",")) {

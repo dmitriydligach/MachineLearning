@@ -130,8 +130,8 @@ public class EvaluatePhenotype extends Thread {
     for(double lambda : Constants.lambdas) {
       double[] foldAccuracy = evaluateLambda(labeled, unlabeled, labelAlphabet, featureAlphabet, lambda);
       double accuracy = StatUtils.mean(foldAccuracy);
-      double variance = StatUtils.variance(foldAccuracy);
-      if((accuracy - bestAccuracy) > variance) {
+      double threshold = Constants.conservativeSearch ? StatUtils.variance(foldAccuracy) : 0;
+      if(accuracy - bestAccuracy > threshold) {
         bestAccuracy = accuracy;
         bestLambda = lambda;
       }

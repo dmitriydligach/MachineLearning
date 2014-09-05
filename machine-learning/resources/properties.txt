@@ -2,18 +2,19 @@
 
 folds=10
 maxLabeled=400
-step=5
+step=10
 iterations=25
 rndSeed=100
 defaultLambda=1.0
 
 gridSearch=false
-devFolds=5
-devIterations=15
-lambdas=0.05,0.10,0.25,0.5
+conservativeSearch=false
+devFolds=10
+devIterations=25
+lambdas=0.05,0.25,0.50,0.75,1.0
 
 phenotypes=cd,uc,ms,t2d
-unlabeledSizes=500,1000,3000,5000
+unlabeledSizes=500,1000,3000
 
 dataDir=/Users/Dima/Boston/Data/Phenotype/
 cdData=IBD/Data/data.txt
