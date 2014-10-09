@@ -69,7 +69,8 @@ public class I2b2Dataset extends Dataset {
       			instance.addFeature(feature, value);
       		}
       	}
-
+        
+        // instance.collapseNegatedFeatures();
       	instances.add(instance);
       }
     }

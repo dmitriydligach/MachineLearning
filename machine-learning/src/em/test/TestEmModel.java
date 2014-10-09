@@ -1,7 +1,9 @@
 package em.test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
 import data.Dataset;
 import data.I2b2Dataset;
@@ -10,10 +12,16 @@ import em.implementation.EmModel;
 
 public class TestEmModel {
 	
+  public static Set<String> msSourceLabels = new HashSet<String>(Arrays.asList("2", "3", "4", "5"));
+  public static String msTargetLabel = "2";
+  public static Set<String> t2dSourceLabels = new HashSet<String>(Arrays.asList("\"possible\""));
+  public static String t2dTargetLabel = "\"no\"";
+  
 	public static void main(String[] args) throws IOException {
 
 		I2b2Dataset dataset = new I2b2Dataset();
 		dataset.loadCSVFile(Constants.DATAFILE, Constants.LABELFILE);
+		dataset.mapLabels(t2dSourceLabels, t2dTargetLabel);
 		dataset.makeAlphabets(); // need label alphabet to init NB classifier
 		
 		Split[] splits = dataset.split(Constants.FOLDS);

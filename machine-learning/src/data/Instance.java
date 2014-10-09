@@ -2,6 +2,7 @@ package data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -188,4 +189,33 @@ public class Instance {
 	    features.put(featureName, features.get(featureName) / length);
 	  }
 	}
+	
+  /**
+   * Remove negated versions of CUIs and add their counts
+   * to the respective non-negated CUIs.
+   */
+  public void collapseNegatedFeatures() {
+    
+    Map<String, Float> newFeatures = new HashMap<String, Float>();
+    Set<String> uniqFeatures = new HashSet<String>();
+    
+    for(String feature : features.keySet()) {
+      if(feature.charAt(0) == '-') {
+        uniqFeatures.add(feature.substring(1));
+      } else {
+        uniqFeatures.add(feature);
+      }
+    }
+    
+    for(String feature : uniqFeatures) { 
+      float negatedValue = features.containsKey('-' + feature) ? features.get('-' + feature) : 0;
+      float assertedValue = features.containsKey(feature) ? features.get(feature) : 0;
+      float totalValue = negatedValue + assertedValue;
+      if(totalValue != 0) {
+        newFeatures.put(feature, totalValue);
+      }
+    }
+    
+    features = newFeatures;
+  }
 }
